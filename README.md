@@ -34,6 +34,12 @@ The application will use React as the frontend client and Supabase as the backen
 
 The frontend will communicate with Supabase through a dedicated client configuration and page-level data flows. Sensitive access rules should be enforced through Supabase RLS, not only through frontend UI checks.
 
+## Supabase Foundation
+
+The backend foundation is planned under `docs/supabase/`. This includes the Supabase setup plan, initial PostgreSQL schema, Row Level Security strategy, Storage plan, and Auth strategy.
+
+No Supabase keys, service role keys, database passwords, or real environment secrets should be committed to this repository.
+
 ## Initial MVP Scope
 
 Core MVP features:

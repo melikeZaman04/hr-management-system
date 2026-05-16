@@ -18,10 +18,13 @@ Planned issues:
 - #5 Design initial Supabase database schema
 - #9 Plan Supabase foundation
 - Create Supabase project
+- Create initial database schema
+- Review and convert schema plan into migrations
 - Configure Supabase Auth
-- Create database migrations
-- Plan and apply RLS policies
-- Create storage buckets for CVs and invoices
+- Configure private Storage buckets
+- Plan RLS policies for Admin/HR, Manager, and Employee roles
+- Prepare environment variable strategy
+- Confirm no secret keys are committed
 
 ## Milestone 3: React Foundation
 
