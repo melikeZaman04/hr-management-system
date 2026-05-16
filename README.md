@@ -21,7 +21,11 @@ The first version is focused on an Admin/HR-centered panel. Manager and employee
 ## Technology Stack
 
 - React
+- Vite
+- TypeScript
+- React Router
 - Supabase
+- Supabase JS client
 - PostgreSQL
 - Supabase Auth
 - Supabase Storage
@@ -39,6 +43,43 @@ The frontend will communicate with Supabase through a dedicated client configura
 The backend foundation is planned under `docs/supabase/`. This includes the Supabase setup plan, initial PostgreSQL schema, Row Level Security strategy, Storage plan, and Auth strategy.
 
 No Supabase keys, service role keys, database passwords, or real environment secrets should be committed to this repository.
+
+## Frontend Setup
+
+The frontend foundation uses Vite, React, TypeScript, React Router, and the Supabase JS client.
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create a local environment file from the example:
+
+```bash
+cp .env.example .env.local
+```
+
+Set these values locally:
+
+```env
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+```
+
+Only the Supabase project URL and anon public key should be used in the frontend. Do not commit `.env.local`, service role keys, database passwords, or any private credentials.
+
+Run the local development server:
+
+```bash
+npm run dev
+```
+
+Build the project:
+
+```bash
+npm run build
+```
 
 ## Initial MVP Scope
 
@@ -73,6 +114,6 @@ Example branch names:
 
 ## Project Status
 
-Status: Project planning foundation.
+Status: React foundation initialized.
 
-The repository is currently being prepared with documentation, issue planning, GitHub workflow files, and initial project structure. React implementation has not started yet.
+The repository now includes project planning documentation, Supabase foundation planning, and a Vite React frontend skeleton. Feature implementation and real Supabase data integration will be handled in later issues.
