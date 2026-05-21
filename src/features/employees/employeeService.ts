@@ -11,6 +11,12 @@ export type EmployeeListItem = {
 }
 
 export async function getEmployees() {
+  if (!supabase) {
+    throw new Error(
+      'Supabase is not configured yet. Create .env.local with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.',
+    )
+  }
+
   const { data, error } = await supabase
     .from('employees')
     .select('id, full_name, email, department, position, employment_status, base_salary')

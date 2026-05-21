@@ -19,7 +19,8 @@ Checked on 2026-05-21.
 - #8 Setup GitHub workflow documentation: closed
 - #9 Plan Supabase foundation: closed
 - #10 Plan React foundation: closed
-- #15 Connect employee list page to Supabase: open
+- #15 Connect employee list page to Supabase: closed
+- #17 Prepare Supabase schema and employee seed data: open
 
 ## Pull Request Status
 
@@ -44,7 +45,6 @@ For each issue:
 
 ## Next Recommended Step
 
-Work on issue #15 by connecting the Employees page to Supabase data. This is
-the first read-only Employee Management feature and should establish the data
-loading pattern for later create, detail, leave, salary, device, and document
-features.
+Work on issue #17 by preparing the real Supabase setup steps and fake employee
+seed data. This should make it possible to verify the React Employees page with
+real database rows while keeping secrets out of the repository.

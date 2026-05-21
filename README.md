@@ -44,6 +44,9 @@ The backend foundation is planned under `docs/supabase/`. This includes the Supa
 
 No Supabase keys, service role keys, database passwords, or real environment secrets should be committed to this repository.
 
+To apply the schema and add fake employee records for local verification, follow
+`docs/supabase/06-apply-schema-and-seed.md`.
+
 ## Frontend Setup
 
 The frontend foundation uses Vite, React, TypeScript, React Router, and the Supabase JS client.
