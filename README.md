@@ -167,6 +167,7 @@ Example branch names:
 - `docs/06-development-roadmap.md`
 - `docs/07-github-workflow.md`
 - `docs/supabase/06-apply-schema-and-seed.md`
+- `docs/supabase/07-auth-login-setup.md`
 
 ## Project Status
 

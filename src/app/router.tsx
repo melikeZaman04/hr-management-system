@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { App } from './App'
+import { ProtectedRoute } from '../features/auth/ProtectedRoute'
 import { AppLayout } from '../layouts/AppLayout'
 import { DashboardPage } from '../pages/DashboardPage'
 import { DevicesPage } from '../pages/DevicesPage'
@@ -24,35 +25,40 @@ export const router = createBrowserRouter([
         element: <LoginPage />,
       },
       {
-        element: <AppLayout />,
+        element: <ProtectedRoute />,
         children: [
           {
-            path: 'dashboard',
-            element: <DashboardPage />,
-          },
-          {
-            path: 'employees',
-            element: <EmployeesPage />,
-          },
-          {
-            path: 'employees/:id',
-            element: <EmployeeDetailPage />,
-          },
-          {
-            path: 'leave-requests',
-            element: <LeaveRequestsPage />,
-          },
-          {
-            path: 'salary-calculation',
-            element: <SalaryCalculationPage />,
-          },
-          {
-            path: 'devices',
-            element: <DevicesPage />,
-          },
-          {
-            path: 'documents',
-            element: <DocumentsPage />,
+            element: <AppLayout />,
+            children: [
+              {
+                path: 'dashboard',
+                element: <DashboardPage />,
+              },
+              {
+                path: 'employees',
+                element: <EmployeesPage />,
+              },
+              {
+                path: 'employees/:id',
+                element: <EmployeeDetailPage />,
+              },
+              {
+                path: 'leave-requests',
+                element: <LeaveRequestsPage />,
+              },
+              {
+                path: 'salary-calculation',
+                element: <SalaryCalculationPage />,
+              },
+              {
+                path: 'devices',
+                element: <DevicesPage />,
+              },
+              {
+                path: 'documents',
+                element: <DocumentsPage />,
+              },
+            ],
           },
         ],
       },

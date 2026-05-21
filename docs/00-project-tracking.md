@@ -22,6 +22,9 @@ Checked on 2026-05-21.
 - #15 Connect employee list page to Supabase: closed
 - #17 Prepare Supabase schema and employee seed data: closed
 - #19 Add development employee read RLS policy: closed
+- #23 Development employee okuma izni icin anon grantlerini dokumante et: closed
+- #25 Connect employee detail page to Supabase: closed
+- #27 Supabase Auth login/logout ve protected routes ekle: open
 
 ## Pull Request Status
 
@@ -32,6 +35,9 @@ Checked on 2026-05-21.
 - #16 feat: connect employee list to Supabase: merged
 - #18 docs: prepare Supabase schema and seed workflow: merged
 - #20 docs: add development employee read RLS policy: merged
+- #22 docs: clean project presentation: merged
+- #24 docs: document anon grants for employee reads: merged
+- #26 feat: connect employee detail to Supabase: merged
 
 ## Working Method
 
@@ -49,6 +55,6 @@ For each issue:
 
 ## Next Recommended Step
 
-Create the next Employee Management issue for a controlled employee detail or
-create-employee workflow. Before using real data, replace the development-only
-employee read policy with authenticated Admin/HR RLS policies.
+Work on issue #27 by adding Supabase Auth login/logout and protected routes.
+After this, connect `profiles` roles to the authenticated user and replace the
+development-only RLS policy with Admin/HR and Employee role policies.

@@ -17,11 +17,11 @@
 
 drop policy if exists "dev_only_read_employees" on public.employees;
 
-grant usage on schema public to anon;
-grant select on public.employees to anon;
+grant usage on schema public to anon, authenticated;
+grant select on public.employees to anon, authenticated;
 
 create policy "dev_only_read_employees"
 on public.employees
 for select
-to anon
+to anon, authenticated
 using (true);

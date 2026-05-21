@@ -22,6 +22,7 @@ System.
 - `supabase/04-storage-plan.md`
 - `supabase/05-auth-strategy.md`
 - `supabase/06-apply-schema-and-seed.md`
+- `supabase/07-auth-login-setup.md`
 - `supabase/seed-employees.sql`
 - `supabase/dev-only-employee-read-policy.sql`
 
