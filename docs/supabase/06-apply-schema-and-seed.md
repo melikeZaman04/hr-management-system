@@ -74,15 +74,17 @@ is useful for learning and UI verification, but it is not safe for real HR data.
 Remove it before adding real employee records or replace it with authenticated
 Admin/HR policies.
 
-Bu policy dosyasi Supabase `anon` rolune gecici development `select` izni de
-verir. Buradaki iki katman farklidir:
+Bu policy dosyasi Supabase `anon` ve `authenticated` rollerine gecici
+development `select` izni de verir. Buradaki iki katman farklidir:
 
 - SQL `grant`, rolun tabloya sorgu atip atamayacagini belirler.
 - RLS policy, rol sorgu atabiliyorsa hangi satirlari gorecegini belirler.
 
 Bu nedenle development okuma akisi icin ikisine de ihtiyac vardir. Sadece RLS
 policy yazmak yeterli olmayabilir; tablo privilege'i yoksa frontend
-`permission denied for table employees` hatasi alir.
+`permission denied for table employees` hatasi alir. Login eklendikten sonra
+istekler `authenticated` roluyle gidecegi icin development okuma izni bu rolu de
+kapsar.
 
 Run the React app:
 

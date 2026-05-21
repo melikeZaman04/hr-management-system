@@ -107,6 +107,29 @@ a {
   padding: 8px 12px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: right;
+}
+
+.header-actions div {
+  display: grid;
+  gap: 3px;
+}
+
+.header-actions strong {
+  color: #12384f;
+  font-size: 14px;
+}
+
+.header-user-label {
+  color: #52616f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .page-shell {
   padding: 28px;
 }
@@ -308,6 +331,67 @@ a {
   padding: 32px;
 }
 
+.login-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.login-form label {
+  display: grid;
+  gap: 7px;
+  color: #12384f;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.login-form input {
+  width: 100%;
+  border: 1px solid #b8c7d3;
+  border-radius: 8px;
+  color: #1f2933;
+  font: inherit;
+  padding: 11px 12px;
+}
+
+.login-form input:focus {
+  border-color: #184e77;
+  outline: 3px solid #d7eaf5;
+}
+
+.primary-button,
+.secondary-button {
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 10px 14px;
+}
+
+.primary-button {
+  border: 1px solid #184e77;
+  background: #184e77;
+  color: #ffffff;
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.secondary-button {
+  border: 1px solid #b8c7d3;
+  background: #ffffff;
+  color: #184e77;
+}
+
+.centered-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+}
+
 @media (max-width: 860px) {
   .app-shell {
     grid-template-columns: 1fr;
@@ -325,6 +409,12 @@ a {
   .header {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .header-actions {
+    align-items: flex-start;
+    flex-direction: column;
+    text-align: left;
   }
 
   .stat-grid {
