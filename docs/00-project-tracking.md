@@ -20,7 +20,8 @@ Checked on 2026-05-21.
 - #9 Plan Supabase foundation: closed
 - #10 Plan React foundation: closed
 - #15 Connect employee list page to Supabase: closed
-- #17 Prepare Supabase schema and employee seed data: open
+- #17 Prepare Supabase schema and employee seed data: closed
+- #19 Add development employee read RLS policy: open
 
 ## Pull Request Status
 
@@ -45,6 +46,6 @@ For each issue:
 
 ## Next Recommended Step
 
-Work on issue #17 by preparing the real Supabase setup steps and fake employee
-seed data. This should make it possible to verify the React Employees page with
-real database rows while keeping secrets out of the repository.
+Work on issue #19 by adding a development-only RLS read policy for fake employee
+data. This unblocks local Employees page verification while keeping the
+production security risk clearly documented.

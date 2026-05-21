@@ -65,6 +65,15 @@ service role key must never be used in React.
 
 ## Step 4: Verify the Employees Page
 
+Because the schema enables RLS, the frontend may not be able to read employee
+rows immediately after seeding. For fake development data only, you can apply
+`docs/supabase/dev-only-employee-read-policy.sql` before verifying the page.
+
+This policy allows unauthenticated frontend reads of the `employees` table. It
+is useful for learning and UI verification, but it is not safe for real HR data.
+Remove it before adding real employee records or replace it with authenticated
+Admin/HR policies.
+
 Run the React app:
 
 ```bash
@@ -93,7 +102,9 @@ an authorization error until policies are added.
 
 For real users, add explicit policies before storing sensitive data. For early
 development, use only fake seed data and document any temporary policy decisions
-before applying them.
+before applying them. The temporary development policy in
+`docs/supabase/dev-only-employee-read-policy.sql` should be removed or replaced
+when Auth and Admin/HR role policies are implemented.
 
 ## Secret Handling Rules
 
