@@ -28,15 +28,20 @@ Planned issues:
 
 ## Milestone 3: React Foundation
 
+Current phase: active foundation setup.
+
 Planned issues:
 
 - #6 Plan initial UI flow
 - #10 Plan React foundation
-- Initialize React project
-- Configure routing
-- Create shared layout
-- Configure Supabase client
-- Add protected route structure
+- Initialize Vite React TypeScript project
+- Install React Router and Supabase JS client
+- Configure initial route structure
+- Create shared layout skeleton
+- Create placeholder MVP pages
+- Configure Supabase client file with environment variables
+- Add `.env.example`
+- Plan protected route structure for later Auth work
 
 ## Milestone 4: Employee Management
 
