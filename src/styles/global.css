@@ -168,6 +168,97 @@ a {
   font-size: 30px;
 }
 
+.data-panel {
+  display: grid;
+  gap: 16px;
+  border: 1px solid #d9dee7;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 18px;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.panel-heading h3,
+.panel-heading p {
+  margin: 0;
+}
+
+.panel-heading h3 {
+  color: #12384f;
+  font-size: 18px;
+}
+
+.panel-heading p {
+  color: #52616f;
+  font-size: 14px;
+}
+
+.state-box {
+  border: 1px dashed #b8c7d3;
+  border-radius: 8px;
+  color: #52616f;
+  padding: 18px;
+}
+
+.state-box-error {
+  border-color: #e19595;
+  background: #fff5f5;
+  color: #9b1c1c;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  border-bottom: 1px solid #e5eaf0;
+  padding: 13px 12px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.data-table th {
+  color: #52616f;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.data-table td {
+  color: #1f2933;
+  font-size: 14px;
+}
+
+.table-link {
+  color: #184e77;
+  font-weight: 700;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+  background: #eaf3f8;
+  color: #12384f;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 5px 10px;
+  text-transform: capitalize;
+}
+
 .login-page {
   display: grid;
   min-height: 100vh;

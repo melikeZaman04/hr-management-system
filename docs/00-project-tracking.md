@@ -18,7 +18,8 @@ Checked on 2026-05-21.
 - #7 Create development roadmap: closed
 - #8 Setup GitHub workflow documentation: closed
 - #9 Plan Supabase foundation: closed
-- #10 Plan React foundation: open
+- #10 Plan React foundation: closed
+- #15 Connect employee list page to Supabase: open
 
 ## Pull Request Status
 
@@ -43,6 +44,7 @@ For each issue:
 
 ## Next Recommended Step
 
-Review and complete pull request #13 for issue #10. After that, create the
-first Employee Management implementation issue and begin connecting the React
-frontend to Supabase data.
+Work on issue #15 by connecting the Employees page to Supabase data. This is
+the first read-only Employee Management feature and should establish the data
+loading pattern for later create, detail, leave, salary, device, and document
+features.
