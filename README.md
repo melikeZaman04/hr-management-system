@@ -2,6 +2,22 @@
 
 HR Management System is a web-based human resources management platform built with React and Supabase. The system aims to manage employee records, leave requests, salary calculations based on unpaid leave, and device assignment tracking from a centralized dashboard.
 
+## Current Status
+
+Status: Employee list foundation ready for Supabase verification.
+
+Completed so far:
+
+- Project planning and GitHub workflow documentation
+- Supabase schema planning and SQL baseline
+- React, Vite, TypeScript, and React Router foundation
+- Shared layout with sidebar/header navigation
+- MVP placeholder pages
+- Supabase client configuration
+- Read-only Employees page connected through a feature service
+- Fake employee seed data for development verification
+- Development-only employee read RLS policy for fake data
+
 ## Project Purpose
 
 The purpose of this project is to build a clean, maintainable HR management system that can be developed as a real software project. The repository will use GitHub Issues, labels, milestones, branches, pull requests, and documentation from the beginning.
@@ -38,6 +54,25 @@ The application will use React as the frontend client and Supabase as the backen
 
 The frontend will communicate with Supabase through a dedicated client configuration and page-level data flows. Sensitive access rules should be enforced through Supabase RLS, not only through frontend UI checks.
 
+Current frontend structure:
+
+```txt
+src/
+  app/                 Router and application shell
+  components/          Shared layout and UI components
+  features/            Feature-level data access and business logic
+  layouts/             Page layout wrappers
+  lib/                 External client configuration
+  pages/               Route-level pages
+  styles/              Global styles
+```
+
+Current data flow:
+
+```txt
+React page -> feature service -> Supabase client -> Supabase API -> PostgreSQL
+```
+
 ## Supabase Foundation
 
 The backend foundation is planned under `docs/supabase/`. This includes the Supabase setup plan, initial PostgreSQL schema, Row Level Security strategy, Storage plan, and Auth strategy.
@@ -46,6 +81,12 @@ No Supabase keys, service role keys, database passwords, or real environment sec
 
 To apply the schema and add fake employee records for local verification, follow
 `docs/supabase/06-apply-schema-and-seed.md`.
+
+Development verification SQL files:
+
+- `docs/supabase/02-database-schema.sql`
+- `docs/supabase/seed-employees.sql`
+- `docs/supabase/dev-only-employee-read-policy.sql`
 
 ## Frontend Setup
 
@@ -115,8 +156,21 @@ Example branch names:
 - `feature/5-database-schema`
 - `feature/10-react-foundation`
 
+## Useful Documentation
+
+- `docs/00-project-tracking.md`
+- `docs/01-project-scope.md`
+- `docs/02-system-modules.md`
+- `docs/03-user-roles-and-permissions.md`
+- `docs/04-database-design.md`
+- `docs/05-ui-flow.md`
+- `docs/06-development-roadmap.md`
+- `docs/07-github-workflow.md`
+- `docs/supabase/06-apply-schema-and-seed.md`
+
 ## Project Status
 
-Status: React foundation initialized.
-
-The repository now includes project planning documentation, Supabase foundation planning, and a Vite React frontend skeleton. Feature implementation and real Supabase data integration will be handled in later issues.
+The repository now includes the planning foundation, Supabase setup workflow,
+React foundation, and the first Employee Management read-only list flow. The
+next product step is to implement authenticated Admin/HR access and replace the
+development-only RLS policy with production-safe policies.

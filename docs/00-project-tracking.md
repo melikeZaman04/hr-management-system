@@ -21,14 +21,17 @@ Checked on 2026-05-21.
 - #10 Plan React foundation: closed
 - #15 Connect employee list page to Supabase: closed
 - #17 Prepare Supabase schema and employee seed data: closed
-- #19 Add development employee read RLS policy: open
+- #19 Add development employee read RLS policy: closed
 
 ## Pull Request Status
 
 - #11 docs: add project planning foundation: merged
 - #12 docs: plan supabase foundation: merged
-- #13 chore: initialize react foundation: open
+- #13 chore: initialize react foundation: merged
 - #14 docs: plan supabase foundation: merged
+- #16 feat: connect employee list to Supabase: merged
+- #18 docs: prepare Supabase schema and seed workflow: merged
+- #20 docs: add development employee read RLS policy: merged
 
 ## Working Method
 
@@ -46,6 +49,6 @@ For each issue:
 
 ## Next Recommended Step
 
-Work on issue #19 by adding a development-only RLS read policy for fake employee
-data. This unblocks local Employees page verification while keeping the
-production security risk clearly documented.
+Create the next Employee Management issue for a controlled employee detail or
+create-employee workflow. Before using real data, replace the development-only
+employee read policy with authenticated Admin/HR RLS policies.
