@@ -10,6 +10,7 @@ import { EmployeesPage } from '../pages/EmployeesPage'
 import { LeaveRequestsPage } from '../pages/LeaveRequestsPage'
 import { LoginPage } from '../pages/LoginPage'
 import { SalaryCalculationPage } from '../pages/SalaryCalculationPage'
+import { ProfilePage } from '../pages/ProfilePage'
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
         element: <LoginPage />,
       },
       {
+        // All authenticated routes
         element: <ProtectedRoute />,
         children: [
           {
@@ -35,20 +37,12 @@ export const router = createBrowserRouter([
                 element: <DashboardPage />,
               },
               {
-                path: 'employees',
-                element: <EmployeesPage />,
-              },
-              {
-                path: 'employees/:id',
-                element: <EmployeeDetailPage />,
+                path: 'profile',
+                element: <ProfilePage />,
               },
               {
                 path: 'leave-requests',
                 element: <LeaveRequestsPage />,
-              },
-              {
-                path: 'salary-calculation',
-                element: <SalaryCalculationPage />,
               },
               {
                 path: 'devices',
@@ -57,6 +51,32 @@ export const router = createBrowserRouter([
               {
                 path: 'documents',
                 element: <DocumentsPage />,
+              },
+
+              // Admin HR + Manager only
+              {
+                element: <ProtectedRoute allowedRoles={['admin_hr', 'manager']} />,
+                children: [
+                  {
+                    path: 'employees',
+                    element: <EmployeesPage />,
+                  },
+                  {
+                    path: 'employees/:id',
+                    element: <EmployeeDetailPage />,
+                  },
+                ],
+              },
+
+              // Admin HR only
+              {
+                element: <ProtectedRoute allowedRoles={['admin_hr']} />,
+                children: [
+                  {
+                    path: 'salary-calculation',
+                    element: <SalaryCalculationPage />,
+                  },
+                ],
               },
             ],
           },
