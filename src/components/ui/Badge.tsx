@@ -20,16 +20,16 @@ export function Badge({ children, tone = 'neutral', dot = true, solid }: BadgePr
 }
 
 const STATUS_MAP: Record<string, [Tone, string]> = {
-  active:     ['success', 'Active'],
-  inactive:   ['neutral', 'Inactive'],
-  terminated: ['danger',  'Terminated'],
-  pending:    ['warning', 'Pending'],
-  approved:   ['success', 'Approved'],
-  rejected:   ['danger',  'Rejected'],
-  available:  ['success', 'Available'],
-  assigned:   ['info',    'Assigned'],
-  returned:   ['neutral', 'Returned'],
-  broken:     ['danger',  'Broken'],
+  active:     ['success', 'Aktif'],
+  inactive:   ['neutral', 'Pasif'],
+  terminated: ['danger',  'Ayrıldı'],
+  pending:    ['warning', 'Beklemede'],
+  approved:   ['success', 'Onaylandı'],
+  rejected:   ['danger',  'Reddedildi'],
+  available:  ['success', 'Atanmamış'],
+  assigned:   ['info',    'Atanmış'],
+  returned:   ['neutral', 'İade edildi'],
+  broken:     ['danger',  'Arızalı'],
 }
 
 export function StatusBadge({ status }: { status: string }) {
