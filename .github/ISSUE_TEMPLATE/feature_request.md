@@ -1,24 +1,27 @@
 ---
-name: Feature Request
-about: Suggest or plan a new feature
-title: ""
+name: Özellik Talebi
+about: Yeni bir özellik veya geliştirme önermek için
+title: "[Feature]: "
 labels: "type: feature"
 assignees: ""
 ---
 
-## Feature Summary
+## Özellik Özeti
 
 
 ## Problem
 
+Bu özellik hangi ihtiyacı çözüyor?
 
-## Proposed Solution
-
-
-## User Role
+## Önerilen Çözüm
 
 
-## Acceptance Criteria
+## İlgili Kullanıcı Rolü
+
+- [ ] Admin/HR
+- [ ] Manager
+- [ ] Employee
+
+## Kabul Kriterleri
 
 - [ ] 
-

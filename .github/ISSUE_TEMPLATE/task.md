@@ -1,25 +1,24 @@
 ---
-name: Task
-about: Plan or track a project task
-title: ""
-labels: ""
+name: Görev
+about: Proje görevi veya teknik iş takibi için
+title: "[Task]: "
+labels: "type: task"
 assignees: ""
 ---
 
-## Summary
+## Özet
 
 
-## Goal
+## Amaç
 
 
-## Tasks
-
-- [ ] 
-
-## Acceptance Criteria
+## Yapılacaklar
 
 - [ ] 
 
-## Notes
+## Kabul Kriterleri
 
+- [ ] 
+
+## Notlar
 
