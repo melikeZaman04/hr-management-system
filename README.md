@@ -1,10 +1,10 @@
-# HR Management System
+# HRCore
 
-HR Management System is a web-based human resources management platform built with React and Supabase. The system aims to manage employee records, leave requests, salary calculations based on unpaid leave, and device assignment tracking from a centralized dashboard.
+HRCore is a web-based human resources management platform built with React and Supabase. The system aims to manage employee records, leave requests, salary calculations based on unpaid leave, and device assignment tracking from a centralized dashboard.
 
 ## Current Status
 
-Status: Employee list foundation ready for Supabase verification.
+Status: Auth-protected MVP dashboard with Supabase-backed employee, leave, salary, device, and document flows.
 
 Completed so far:
 
@@ -12,11 +12,19 @@ Completed so far:
 - Supabase schema planning and SQL baseline
 - React, Vite, TypeScript, and React Router foundation
 - Shared layout with sidebar/header navigation
-- MVP placeholder pages
+- MVP application pages
 - Supabase client configuration
 - Read-only Employees page connected through a feature service
 - Fake employee seed data for development verification
-- Development-only employee read RLS policy for fake data
+- Supabase Auth login/logout and protected routes
+- Profile-based Admin/HR, Manager, and Employee route guards
+- Employee creation flow backed by Supabase
+- Device inventory, device creation, assignment, and return flows backed by Supabase
+- Leave request creation and manager approval/rejection flow backed by Supabase
+- Salary calculation records backed by Supabase
+- Document upload/download flow backed by Supabase Storage
+- CSV exports for dashboard, employees, leave requests, salary records, devices, and documents
+- SQL helpers for first Admin/HR profile bootstrap and fake device seed data
 
 ## Project Purpose
 
@@ -75,18 +83,9 @@ React page -> feature service -> Supabase client -> Supabase API -> PostgreSQL
 
 ## Supabase Foundation
 
-The backend foundation is planned under `docs/supabase/`. This includes the Supabase setup plan, initial PostgreSQL schema, Row Level Security strategy, Storage plan, and Auth strategy.
+Supabase provides authentication, PostgreSQL database tables, file storage, and Row Level Security (RLS) policies.
 
 No Supabase keys, service role keys, database passwords, or real environment secrets should be committed to this repository.
-
-To apply the schema and add fake employee records for local verification, follow
-`docs/supabase/06-apply-schema-and-seed.md`.
-
-Development verification SQL files:
-
-- `docs/supabase/02-database-schema.sql`
-- `docs/supabase/seed-employees.sql`
-- `docs/supabase/dev-only-employee-read-policy.sql`
 
 ## Frontend Setup
 
@@ -156,22 +155,10 @@ Example branch names:
 - `feature/5-database-schema`
 - `feature/10-react-foundation`
 
-## Useful Documentation
-
-- `docs/00-project-tracking.md`
-- `docs/01-project-scope.md`
-- `docs/02-system-modules.md`
-- `docs/03-user-roles-and-permissions.md`
-- `docs/04-database-design.md`
-- `docs/05-ui-flow.md`
-- `docs/06-development-roadmap.md`
-- `docs/07-github-workflow.md`
-- `docs/supabase/06-apply-schema-and-seed.md`
-- `docs/supabase/07-auth-login-setup.md`
-
 ## Project Status
 
 The repository now includes the planning foundation, Supabase setup workflow,
-React foundation, and the first Employee Management read-only list flow. The
-next product step is to implement authenticated Admin/HR access and replace the
-development-only RLS policy with production-safe policies.
+React foundation, authenticated role-based access, and the core MVP workflows.
+The remaining release step is manual Supabase verification: apply production RLS
+and storage policies, bootstrap the first Admin/HR profile, seed demo data if
+needed, then smoke test the live project end to end.
