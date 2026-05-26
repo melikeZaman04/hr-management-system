@@ -1,18 +1,18 @@
 import { supabase } from '../../lib/supabaseClient'
 
+// Mirrors public.salary_records schema exactly.
 export type SalaryRecord = {
   id: string
   employee_id: string
   month: number
   year: number
-  annual_base_salary: number
-  unpaid_days: number
-  monthly_base: number
-  deduction: number
-  total: number
-  notes: string | null
-  calculated_by: string | null
+  base_salary: number
+  unpaid_leave_days: number
+  deduction_amount: number
+  calculated_salary: number
+  calculated_by: string | null  // profiles.id UUID
   created_at: string
+  updated_at: string
 }
 
 function client() {
@@ -22,9 +22,10 @@ function client() {
 
 export async function getSalaryRecords(employeeId?: string) {
   let q = client()
-    .from('salary_calculations')
+    .from('salary_records')
     .select('*')
-    .order('created_at', { ascending: false })
+    .order('year', { ascending: false })
+    .order('month', { ascending: false })
 
   if (employeeId) {
     q = q.eq('employee_id', employeeId)
@@ -35,9 +36,11 @@ export async function getSalaryRecords(employeeId?: string) {
   return (data ?? []) as SalaryRecord[]
 }
 
-export async function saveSalaryRecord(record: Omit<SalaryRecord, 'id' | 'created_at'>) {
+export async function saveSalaryRecord(
+  record: Omit<SalaryRecord, 'id' | 'created_at' | 'updated_at'>,
+) {
   const { data, error } = await client()
-    .from('salary_calculations')
+    .from('salary_records')
     .insert(record)
     .select()
     .single()
@@ -45,10 +48,10 @@ export async function saveSalaryRecord(record: Omit<SalaryRecord, 'id' | 'create
   return data as SalaryRecord
 }
 
-export function calcSalary(annualBase: number, unpaidDays: number) {
-  const monthlyBase = Math.round(annualBase / 12)
-  const daily = Math.round(monthlyBase / 22)
+export function calcSalary(baseSalary: number, unpaidDays: number) {
+  const monthlyBase = baseSalary
+  const daily = Math.round(baseSalary / 30)
   const deduction = daily * unpaidDays
-  const total = monthlyBase - deduction
+  const total = baseSalary - deduction
   return { monthlyBase, daily, deduction, total }
 }
