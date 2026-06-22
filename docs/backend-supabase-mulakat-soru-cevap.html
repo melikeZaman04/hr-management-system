@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <title>backend-supabase-mulakat-soru-cevap</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: #172033;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.55;
+      background: #ffffff;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      padding-bottom: 10px;
+      color: #0f172a;
+      font-size: 22pt;
+      line-height: 1.15;
+      border-bottom: 2px solid #d7dce5;
+    }
+
+    h2 {
+      break-after: avoid;
+      margin: 22px 0 8px;
+      color: #1d4ed8;
+      font-size: 13.5pt;
+      line-height: 1.3;
+    }
+
+    h3 {
+      break-after: avoid;
+      margin: 18px 0 8px;
+      color: #334155;
+      font-size: 11.5pt;
+    }
+
+    p {
+      margin: 0 0 9px;
+    }
+
+    strong {
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    ul {
+      margin: 0 0 10px 18px;
+      padding: 0;
+    }
+
+    li {
+      margin: 2px 0;
+    }
+
+    code {
+      padding: 1px 4px;
+      border-radius: 4px;
+      color: #0f172a;
+      background: #eef2f7;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 9.5pt;
+    }
+
+    pre {
+      break-inside: avoid;
+      margin: 8px 0 12px;
+      padding: 10px 12px;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      border: 1px solid #dbe3ef;
+      border-radius: 6px;
+      background: #f8fafc;
+    }
+
+    pre code {
+      padding: 0;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+<h1>Backend ve Supabase Mulakat Soru-Cevap Notlari</h1>
+<p>Bu dokuman, HRCore projesinde Supabase backend tarafinda neler yapildigini isveren/mulakat formatinda anlatmak icin hazirlanmistir.</p>
+<h2>1. Bu projede neden ayri bir Node.js/Express backend yerine Supabase kullandin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Bu projede MVP seviyesinde ama gercek backend mantigina sahip bir insan kaynaklari uygulamasi gelistirmek istedim. Supabase bana PostgreSQL database, Authentication, Storage ve Row Level Security ozelliklerini hazir verdigi icin ayri bir Express backend kurmadan backend ihtiyacini karsilayabildim.</p>
+<p>Burada amac sadece hizli gelistirmek degildi. Supabase sayesinde iliskisel veritabani, rol bazli yetkilendirme, dosya saklama ve canli veri guvenligi gibi production'a yakin konulari da uygulamis oldum.</p>
+<h2>2. Supabase'i sadece database olarak mi kullandin, yoksa backend platformu olarak mi?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Supabase'i sadece database olarak kullanmadim. Bu projede Supabase backend platformu gibi calisti.</p>
+<p>Kullandigim ana parcalar sunlardi:</p>
+<ul><li>Supabase Auth ile kullanici girisi ve session yonetimi</li><li>PostgreSQL tablolar ile uygulama verilerinin saklanmasi</li><li>Supabase Storage ile calisan dokumanlari ve cihaz faturalarinin saklanmasi</li><li>Row Level Security ile rol bazli veri erisimi</li><li>Supabase JS Client ile React uygulamasinin backend'e baglanmasi</li></ul>
+<p>Yani uygulamanin backend tarafindaki temel katmanlari Supabase uzerinden kuruldu.</p>
+<h2>3. <code>VITE_SUPABASE_URL</code> ve <code>VITE_SUPABASE_ANON_KEY</code> ne ise yariyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>VITE_SUPABASE_URL</code>, Supabase projesinin API adresidir. React uygulamasi hangi Supabase projesine baglanacagini bu URL ile bilir.</p>
+<p><code>VITE_SUPABASE_ANON_KEY</code> ise frontend tarafindan kullanilabilen public API key'dir. React uygulamasi bu key ile Supabase'e istek atar.</p>
+<p>Projede bu degerler <code>.env.local</code> dosyasindan okunuyor ve <code>src/lib/supabaseClient.ts</code> icinde <code>createClient</code> ile Supabase client olusturuluyor.</p>
+<h2>4. Anon key frontend'de gorunuyorsa bu guvenlik acigi degil mi?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Tek basina guvenlik acigi degil. Supabase'te anon key zaten frontend'de kullanilmak uzere tasarlanmistir. Buradaki asil guvenlik anon key'de degil, Row Level Security policy'lerindedir.</p>
+<p>Eger RLS dogru yazildiysa, kullanici anon key ile Supabase'e istek atsa bile sadece yetkili oldugu satirlara erisebilir. Bu yuzden frontend'de service role key kullanmadim, sadece anon key kullandim.</p>
+<h2>5. Service role key nedir? Neden frontend'e koymamak gerekir?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Service role key, Supabase tarafinda RLS kurallarini bypass edebilen cok yetkili bir anahtardir. Admin seviyesinde islem yapabilir.</p>
+<p>Bu yuzden kesinlikle frontend'e konmamasi gerekir. Frontend kodu kullanicinin tarayicisinda calistigi icin bu key gorulebilir ve kotuye kullanilabilir. Service role key gerekiyorsa sadece server-side ortamda, ornegin Edge Function veya guvenli backend servisinde tutulmalidir.</p>
+<h2>6. Login akisi nasil calisiyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Kullanici email ve password girdiginde <code>supabase.auth.signInWithPassword()</code> fonksiyonu calisir. Supabase kullaniciyi dogrular ve basariliysa session olusturur.</p>
+<p>Sonra uygulama aktif session'i takip eder. <code>AuthProvider</code> icinde <code>getSession()</code> ile mevcut oturum okunur, <code>onAuthStateChange()</code> ile login/logout degisimleri dinlenir.</p>
+<p>Login sonrasi <code>auth.users.id</code> alinir ve bu id ile <code>profiles</code> tablosundan kullanicinin uygulama rolu cekilir.</p>
+<h2>7. Supabase Auth ile <code>profiles</code> tablosu arasindaki iliski nedir?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Supabase Auth kullanicinin kimlik dogrulama tarafini yonetir. Ama uygulama icindeki rol bilgisi, tam ad ve aktiflik durumu <code>profiles</code> tablosunda tutulur.</p>
+<p>Projede temel iliski su sekildedir:</p>
+<pre><code>auth.users.id = profiles.id</code></pre>
+<p>Yani Auth tarafindaki kullanici id'si ile <code>profiles</code> tablosundaki id aynidir. Bu sayede login olan kullanicinin profil ve rol bilgisi kolayca bulunur.</p>
+<h2>8. Neden kullanici rolunu direkt Supabase Auth icinde degil de <code>profiles</code> tablosunda tuttun?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Supabase Auth temel olarak authentication icindir. Uygulama seviyesindeki rol, aktiflik durumu ve profil bilgilerini ayri bir tabloda tutmak daha esnek ve yonetilebilir bir yaklasimdir.</p>
+<p>Bu sayede <code>admin_hr</code>, <code>manager</code>, <code>employee</code> gibi rolleri <code>profiles</code> tablosunda yonettim. Ileride rol degistirme, kullaniciyi pasife alma veya profil bilgisi guncelleme gibi islemler daha rahat yapilabilir.</p>
+<h2>9. <code>auth.users.id</code>, <code>profiles.id</code> ve <code>employees.profile_id</code> arasindaki iliski nedir?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Bu projede kullanici ile calisan kaydi arasinda zincirli bir iliski kuruldu:</p>
+<pre><code>auth.users.id = profiles.id = employees.profile_id</code></pre>
+<p><code>auth.users.id</code>, Supabase Auth kullanicisidir. <code>profiles.id</code>, bu kullanicinin uygulama profilidir. <code>employees.profile_id</code> ise bu profilin hangi calisan kaydina bagli oldugunu gosterir.</p>
+<p>Bu iliski sayesinde employee rolundeki kullanicinin kendi calisan kaydini, izinlerini, cihazlarini ve dokumanlarini bulabiliyoruz.</p>
+<h2>10. Projede hangi roller var?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Projede uc temel rol var:</p>
+<ul><li><code>admin_hr</code>: Tum calisanlari, izinleri, maas kayitlarini, cihazlari ve dokumanlari yonetebilir.</li><li><code>manager</code>: Kendi ekibindeki calisanlari ve ilgili is sureclerini gorebilir.</li><li><code>employee</code>: Sadece kendi profilini, izinlerini, cihazlarini ve dokumanlarini gorebilir.</li></ul>
+<p>Bu roller frontend'de ekran erisimi icin, backend tarafinda ise RLS policy'leri icin kullanildi.</p>
+<h2>11. <code>ProtectedRoute</code> ne ise yariyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>ProtectedRoute</code>, React Router tarafinda sayfa erisimini kontrol eden frontend katmanidir. Kullanici login degilse login sayfasina yonlendirir. Login ise rolune bakar ve ilgili sayfaya erisip erisemeyecegini kontrol eder.</p>
+<p>Ornegin sadece <code>admin_hr</code> rolunun girebilecegi bir sayfaya employee rolundeki kullanici girmeye calisirsa frontend bunu engeller.</p>
+<h2>12. <code>ProtectedRoute</code> gercek guvenlik saglar mi?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Hayir, tek basina gercek guvenlik sayilmaz. <code>ProtectedRoute</code> kullanici deneyimini duzenler. Yani kullanicinin gormemesi gereken ekranlari frontend'de gizler.</p>
+<p>Gercek veri guvenligi Supabase RLS policy'leri ile saglanir. Cunku frontend manipule edilebilir ama Supabase tarafindaki RLS kurallari backend seviyesinde uygulanir.</p>
+<h2>13. Kullanici route guard'i bypass ederse veriye erisebilir mi?</h2>
+<p><strong>Cevap:</strong></p>
+<p>RLS dogru yazildiysa erisemez. Kullanici tarayicida route'u degistirse veya manuel API istegi atsa bile Supabase her sorguda kullanicinin <code>auth.uid()</code> degerine gore izin kontrolu yapar.</p>
+<p>Bu yuzden projede frontend role check ile yetinmedim, backend tarafinda RLS kullandim.</p>
+<h2>14. RLS nedir?</h2>
+<p><strong>Cevap:</strong></p>
+<p>RLS, Row Level Security demektir. PostgreSQL'in satir bazli guvenlik sistemidir. Supabase bunu dogrudan kullanir.</p>
+<p>RLS sayesinde her tablo satiri icin su sorular cevaplanir:</p>
+<ul><li>Bu kullanici bu satiri gorebilir mi?</li><li>Bu kullanici bu satiri ekleyebilir mi?</li><li>Bu kullanici bu satiri guncelleyebilir mi?</li><li>Bu kullanici bu satiri silebilir mi?</li></ul>
+<p>Bu projede employee'nin sadece kendi verisini, manager'in sadece kendi ekibini, admin/hr'nin ise tum verileri gormesi icin RLS mantigi kullanildi.</p>
+<h2>15. RLS ile frontend role check arasindaki fark nedir?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Frontend role check kullanici arayuzunu duzenler. Hangi menunun gorunecegi, hangi sayfaya girilecegi gibi konulari kontrol eder.</p>
+<p>RLS ise backend seviyesinde veri erisimini kontrol eder. Kullanici frontend'i manipule etse bile RLS policy izin vermiyorsa veriyi okuyamaz.</p>
+<p>Kisa ifade ile:</p>
+<pre><code>ProtectedRoute = UI/UX korumasi
+RLS = gercek veri guvenligi</code></pre>
+<h2>16. Employee rolundeki kullanici baska calisanin verisini neden goremiyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Cunku RLS policy kullanicinin <code>auth.uid()</code> degerini calisan kaydindaki <code>profile_id</code> ile karsilastiriyor. Employee sadece kendi <code>profile_id</code> degeriyle eslesen satirlara erisebiliyor.</p>
+<p>Mantik olarak:</p>
+<pre><code>employees.profile_id = auth.uid()</code></pre>
+<p>Bu eslesme yoksa Supabase ilgili satiri kullaniciya dondurmuyor.</p>
+<h2>17. Manager sadece kendi ekibini nasil gorebiliyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>employees</code> tablosunda <code>manager_id</code> alani var. Bir calisanin hangi manager'a bagli oldugu bu alanla tutuluyor.</p>
+<p>Manager login oldugunda once kendi employee kaydi bulunuyor. Sonra RLS policy, manager'in sadece <code>manager_id</code> alani kendi employee id'sine esit olan calisanlara erismesine izin veriyor.</p>
+<h2>18. Admin/HR erisim mantigi nasil?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Admin/HR rolu insan kaynaklari yetkilisi gibi dusunuldu. Bu rol calisan kayitlari, izin talepleri, maas kayitlari, cihazlar ve dokumanlar uzerinde daha genis yetkiye sahip.</p>
+<p>RLS tarafinda <code>profiles.role = 'admin_hr'</code> olan kullanicilar icin tum satirlara erisim saglanacak sekilde policy mantigi kuruldu.</p>
+<h2>19. <code>employees</code> tablosunda hangi bilgileri tuttun?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>employees</code> tablosunda calisanin temel IK bilgileri tutuldu:</p>
+<ul><li>Ad soyad</li><li>Email</li><li>Telefon</li><li>Departman</li><li>Pozisyon</li><li>Ise baslama tarihi</li><li>Calisma durumu</li><li>Temel maas</li><li>Profile baglantisi</li><li>Manager baglantisi</li></ul>
+<p>Bu tablo uygulamanin merkezindeki ana is verisini temsil ediyor.</p>
+<h2>20. <code>manager_id</code> alani neden onemli?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>manager_id</code>, calisanin hangi manager'a bagli oldugunu gostermek icin kullanildi. Bu alan sayesinde ekip yapisi kuruluyor.</p>
+<p>Manager rolundeki kullanici sadece kendi ekibindeki calisanlari gormeli. Bu siniri kurmak icin <code>manager_id</code> kritik bir alan.</p>
+<h2>21. Neden <code>devices</code> ve <code>device_assignments</code> diye iki ayri tablo kullandin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Cunku cihaz bilgisi ile zimmet gecmisi farkli seylerdir.</p>
+<p><code>devices</code> tablosu cihaz envanterini tutar. Ornegin laptop, telefon, marka, model, seri numarasi ve durum bilgisi burada durur.</p>
+<p><code>device_assignments</code> ise cihaz kime, ne zaman atanmis, aktif mi, iade edilmis mi gibi zimmet bilgilerini tutar.</p>
+<p>Bu ayrim sayesinde bir cihazin gecmis atamalarini kaybetmeden takip edebiliriz.</p>
+<h2>22. Bir cihaz calisana atandiginda backend tarafinda ne oluyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Cihaz atama akisinda iki islem var:</p>
+<p>1. <code>device_assignments</code> tablosuna yeni bir aktif atama kaydi eklenir. 2. <code>devices</code> tablosundaki cihaz durumu <code>assigned</code> olarak guncellenir.</p>
+<p>Bu sayede hem cihaz kime atanmis bilgisi tutulur hem de cihaz envanterinde cihaz artik musait gorunmez.</p>
+<h2>23. Cihaz iade edildiginde ne oluyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Cihaz iade edildiginde aktif assignment kaydi <code>returned</code> durumuna cekilir ve <code>returned_at</code> tarihi yazilir. Ardindan <code>devices</code> tablosundaki cihaz durumu tekrar <code>available</code> yapilir.</p>
+<p>Bu sekilde cihaz yeniden atanabilir hale gelir ama eski zimmet kaydi da gecmis olarak korunur.</p>
+<h2>24. Izin talebi olusturma akisi nasil?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Employee izin talebi olusturdugunda <code>leave_requests</code> tablosuna yeni bir kayit eklenir. Bu kayitta calisan id'si, izin tipi, baslangic tarihi, bitis tarihi, toplam gun sayisi, aciklama ve durum bilgisi tutulur.</p>
+<p>Yeni olusturulan talepler varsayilan olarak <code>pending</code> durumunda kaydedilir.</p>
+<h2>25. Izin onaylaninca <code>reviewed_by</code> ve <code>reviewed_at</code> neden guncelleniyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Cunku izin talebini kimin ve ne zaman degerlendirdigini takip etmek gerekiyor. Bu hem is sureci hem de audit/log mantigi acisindan onemli.</p>
+<p>Onay veya red sirasinda aktif kullanici <code>supabase.auth.getUser()</code> ile alinir. Bu kullanicinin id'si <code>reviewed_by</code> alanina, islem zamani ise <code>reviewed_at</code> alanina yazilir.</p>
+<h2>26. Maas kayitlarini neden <code>salary_records</code> tablosunda tuttun?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Maas hesaplamalari donemsel kayitlardir. Her calisan icin ay ve yil bazinda maas, ucretsiz izin gunu, kesinti tutari ve hesaplanan net tutar saklanmalidir.</p>
+<p>Bu yuzden <code>salary_records</code> tablosu kullanildi. Boylece gecmis maas hesaplamalari korunur ve raporlama/CSV export gibi islemler yapilabilir.</p>
+<h2>27. Maas hesaplama frontend'de mi backend'de mi yapiliyor? Production'da nasil gelistirirdin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Bu MVP'de maas hesaplama frontend servis katmaninda yapiliyor ve sonuc Supabase'e kaydediliyor. Hesaplama basit oldugu icin bu MVP icin yeterliydi.</p>
+<p>Ama production ortaminda maas gibi kritik bir hesaplamayi server-side yapmak daha dogru olurdu. Bunu Supabase Edge Function veya ayri bir backend endpoint'e tasirdim. Boylece kullanici frontend'i manipule etse bile nihai hesaplama guvenli ortamda yapilmis olurdu.</p>
+<h2>28. Dokuman upload akisni adim adim anlatir misin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Dokuman upload akisi su sekilde calisiyor:</p>
+<p>1. Kullanici dosya secer. 2. Dosya adi guvenli hale getirilir. 3. Storage path olusturulur. 4. Dosya Supabase Storage'a yuklenir. 5. Upload basarili olursa <code>documents</code> tablosuna metadata kaydi eklenir. 6. Liste yenilenir ve kullanici dokumani gorebilir.</p>
+<p>Storage path formati:</p>
+<pre><code>employees/{employee_id}/{document_type}/{timestamp}_{safe_file_name}</code></pre>
+<h2>29. Dosyayi Storage'a koyup neden ayrica <code>documents</code> tablosuna metadata yazdin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Cunku Storage sadece gercek dosyayi tutar. Uygulama acisindan dosyanin hangi calisana ait oldugu, dokuman tipi, dosya adi, kim tarafindan yuklendigi ve bucket/path bilgisi gibi metadata gerekir.</p>
+<p>Bu yuzden:</p>
+<pre><code>Storage = gercek dosya
+documents tablosu = dosyanin uygulama kaydi</code></pre>
+<p>Bu ayrim filtreleme, listeleme, yetkilendirme ve signed URL uretme icin gerekli.</p>
+<h2>30. Storage bucket nedir? Bu projede hangi bucket'lari kullandin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Storage bucket, dosyalarin saklandigi klasor benzeri alandir. Supabase Storage icinde farkli dosya gruplarini ayirmak icin bucket kullanilir.</p>
+<p>Projede iki ana bucket kullandik:</p>
+<ul><li><code>employee-documents</code>: Calisan dokumanlari</li><li><code>device-invoices</code>: Cihaz faturalari</li></ul>
+<h2>31. Storage path formatini neden bu sekilde sectin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Path formatini calisan, dokuman tipi ve dosya adina gore organize ettim:</p>
+<pre><code>employees/{employee_id}/{document_type}/{timestamp}_{safe_file_name}</code></pre>
+<p>Bu yapi sayesinde dosyalar calisan bazli ayrilir. Dokuman tipi klasor gibi davranir. Timestamp ise ayni isimli dosyalarin cakismasini onler.</p>
+<h2>32. Signed URL nedir? Neden public URL kullanmadin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Signed URL, private dosyaya gecici erisim saglayan imzali linktir. Projede dosya indirmek icin <code>createSignedUrl()</code> kullandim ve linki kisa sureli urettim.</p>
+<p>Public URL kullansaydim dosyalar kalici olarak herkese acik hale gelebilirdi. IK dokumanlari hassas veri oldugu icin private storage ve signed URL daha guvenli bir yaklasimdir.</p>
+<h2>33. Private dosya erisimini nasil kontrol ettin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Dosyalar private bucket mantiginda tutuldu. Kullanici dosya indirmek istediginde once <code>documents</code> tablosundaki metadata kaydina erisebiliyor mu diye RLS belirleyici olur.</p>
+<p>Eger kullanici yetkiliyse uygulama ilgili bucket ve path icin signed URL uretir. Yetkisiz kullanici metadata satirini goremedigi icin dosya path bilgisine ve signed URL akisina ulasamaz.</p>
+<h2>34. Dokuman silme akisi nasil calisiyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Projede once <code>documents</code> tablosundaki metadata kaydi siliniyor. Silme isleminden sonra gercekten satir silinmis mi diye <code>select('id')</code> ile kontrol ediliyor.</p>
+<p>Eger metadata silindiyse sonra Supabase Storage tarafindaki dosya siliniyor. Storage tarafinda dosya zaten yoksa bu kritik hata olarak ele alinmiyor.</p>
+<p>Bu yaklasimda kullanicinin silme yetkisi olup olmadigini RLS uzerinden once database tarafinda dogrulamis oluyoruz.</p>
+<h2>35. Upload sirasinda Storage basarili ama database insert basarisiz olursa ne yapiyorsun?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Bu durumda rollback mantigi uyguladim. Once dosya Storage'a yukleniyor. Sonra <code>documents</code> tablosuna metadata insert ediliyor.</p>
+<p>Eger metadata insert basarisiz olursa, Storage'a yuklenmis dosya siliniyor. Boylece bucket icinde uygulamada karsiligi olmayan orphan dosya kalmasi engelleniyor.</p>
+<h2>36. RLS policy eksikligi yuzunden yasadigin bir problemi anlatir misin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Dokuman silme ozelliginde employee kullanicisinin kendi dokumanini silmesi gerekiyordu. Ancak testte Storage dosyasi silinebilse bile <code>documents</code> tablosundaki metadata satiri silinmiyordu.</p>
+<p>Script ciktisinda <code>cleanup_document=ERR no_rows_deleted</code> hatasini gorduk. Bu, sorgunun hata vermedigini ama RLS yuzunden hicbir satirin silinmedigini gosterdi.</p>
+<p>Sorunun nedeni <code>public.documents</code> tablosunda employee icin DELETE policy eksikligiydi.</p>
+<h2>37. <code>cleanup_document=ERR no_rows_deleted</code> sana ne anlatti?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Bu sonuc bana DELETE sorgusunun calistigini ama RLS policy izin vermedigi icin herhangi bir satirin silinmedigini anlatti.</p>
+<p>Yani problem frontend state problemi degildi. Backend tarafinda documents tablosu icin employee DELETE policy eksikti.</p>
+<h2>38. Bu problem nasil cozulmeli?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>documents</code> tablosuna employee'nin kendi dokumanini silebilmesini saglayan bir DELETE policy eklenmeli.</p>
+<p>Ornek policy:</p>
+<pre><code>create policy &quot;employees can delete own documents&quot;
+on public.documents
+for delete
+to authenticated
+using (
+  uploaded_by = auth.uid()
+  or exists (
+    select 1
+    from public.employees e
+    where e.id = documents.employee_id
+      and e.profile_id = auth.uid()
+  )
+);</code></pre>
+<p>Bu policy ile kullanici kendi yukledigi veya kendi employee kaydina bagli dokumani silebilir.</p>
+<h2>39. Canli Supabase baglantisini nasil test ettin?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>scripts/</code> klasorunde canli kontrol scriptleri yazildi. Bu scriptler <code>.env.local</code> icindeki Supabase URL, anon key ve test kullanici bilgileriyle gercek Supabase projesine baglaniyor.</p>
+<p>Ornek:</p>
+<pre><code>node scripts/supabase-live-check.mjs
+node scripts/supabase-auth-check.mjs employee</code></pre>
+<p>Bu sekilde sadece uygulama ekranindan degil, dogrudan Supabase API uzerinden de baglanti ve yetki davranisi test edildi.</p>
+<h2>40. RLS sinirlarini nasil dogruladin?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>supabase-rls-boundary-check.mjs</code> scriptiyle admin, manager ve employee kullanicilariyla ayri ayri login olduk.</p>
+<p>Sonra su senaryolari test ettik:</p>
+<ul><li>Employee kendi kaydini okuyabiliyor mu?</li><li>Employee baska calisani okuyamiyor mu?</li><li>Manager kendi ekip uyesini okuyabiliyor mu?</li><li>Manager takim disi calisani okuyamiyor mu?</li><li>Admin tum calisan envanterini gorebiliyor mu?</li></ul>
+<p>Bu testler RLS sinirlarinin gercek ortamda calistigini gosterdi.</p>
+<h2>41. Supabase scriptlerini neden yazdin? Manuel test yeterli degil miydi?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Manuel test UI davranisini gormek icin faydali ama RLS gibi backend guvenlik konularinda yeterli degil. Cunku UI bazen veriyi gizleyebilir ama backend hala acik olabilir.</p>
+<p>Scriptlerle dogrudan Supabase API uzerinden farkli rollerle sorgu attim. Bu bana RLS policy'lerinin gercekten dogru calisip calismadigini gosterdi.</p>
+<h2>42. Supabase schema degisikliklerini nereden yonettin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Bu projede schema degisiklikleri Supabase Dashboard uzerinden yonetildi. Tablolar, policy'ler ve storage ayarlari dashboard/SQL Editor uzerinden kontrol edildi.</p>
+<p>Repository icinde local migration sistemi yok. Bu MVP icin kabul edilebilir ama production ortaminda migration dosyalariyla ilerlemek daha dogru olur.</p>
+<h2>43. Bu projede migration sistemi var mi? Production icin nasil iyilestirirdin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Bu projede local migration sistemi yok. Schema degisiklikleri Supabase Dashboard uzerinden yapildi.</p>
+<p>Production icin Supabase CLI migration yapisi kurardim. Boylece tablo, policy ve index degisiklikleri kod gibi versiyonlanir, ekip icinde takip edilir ve CI/CD surecine dahil edilebilir.</p>
+<h2>44. Supabase kullanmanin avantajlari neydi?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Supabase'in en buyuk avantaji MVP gelistirme hizini artirmasi ama ayni zamanda gercek backend kavramlarini desteklemesiydi.</p>
+<p>Avantajlari:</p>
+<ul><li>Hazir Auth sistemi</li><li>PostgreSQL gibi guclu iliskisel database</li><li>RLS ile satir bazli guvenlik</li><li>Storage ile dosya yonetimi</li><li>React ile kolay entegrasyon</li><li>Canli API ve dashboard uzerinden hizli kontrol</li></ul>
+<h2>45. Supabase kullanmanin dikkat edilmesi gereken yanlari neler?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Supabase kullanirken en dikkat edilmesi gereken konu RLS policy'leridir. Public schema API'ye acik oldugu icin RLS kapali veya yanlis yazilmissa veri guvenligi riske girebilir.</p>
+<p>Ayrica service role key kesinlikle frontend'e konmamalidir. Schema degisiklikleri de production'da dashboard uzerinden manuel degil, migration ile yonetilmelidir.</p>
+<h2>46. Bu backend yapisinda en kritik guvenlik noktasi nedir?</h2>
+<p><strong>Cevap:</strong></p>
+<p>En kritik nokta RLS policy'lerinin dogru yazilmasidir. Cunku frontend tarafindaki buton, menu veya route kontrolleri asil guvenlik degildir.</p>
+<p>Kullanici hangi istegi atarsa atsin Supabase tarafinda satir bazli yetki kontrolu dogru calismalidir. Bu yuzden RLS'i hem tasarladik hem de scriptlerle test ettik.</p>
+<h2>47. Production'a cikacak olsan backend tarafinda ilk neyi guclendirirdin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Ilk olarak migration sistemini kurardim. Supabase CLI ile tablo, policy ve storage degisikliklerini versiyonlardim.</p>
+<p>Sonra kritik is mantiklarini Edge Function veya server-side backend'e tasirdim. Ozellikle maas hesaplama, toplu veri islemleri, admin seviyesindeki operasyonlar ve audit log gibi konulari frontend'den uzaklastirirdim.</p>
+<h2>48. Edge Function kullanir miydin? Hangi islemleri tasirdin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Evet, production ortaminda kullanirdim.</p>
+<p>Edge Function'a tasiyabilecegim islemler:</p>
+<ul><li>Maas hesaplama</li><li>Kritik admin operasyonlari</li><li>Toplu import/export islemleri</li><li>Dosya isleme veya virus tarama gibi storage sonrasi islemler</li><li>Audit log yazma</li><li>Service role key gerektiren guvenli islemler</li></ul>
+<p>Boylece hassas is mantigi kullanicinin tarayicisinda degil, guvenli server-side ortamda calisir.</p>
+<h2>49. Bu projede backend tarafinda en cok ne ogrendin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Bu projede backend'in sadece veri kaydetmek olmadigini daha iyi gordum. Auth, rol modeli, tablo iliskileri, RLS, storage metadata iliskisi ve canli test sureci birlikte dusunulmeli.</p>
+<p>Ozellikle RLS policy eksikligini testle yakalamak benim icin onemliydi. Cunku frontend'de her sey dogru gorunse bile backend policy eksikse veri davranisi hatali olabiliyor.</p>
+<h2>50. Bu projeyi tek cumleyle backend acisindan nasil ozetlersin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Bu projede Supabase'i backend platformu olarak kullanarak Auth, PostgreSQL, Storage, RLS ve rol bazli erisim katmanlarini kurdum; React tarafinda ise veri erisimini moduller bazinda service dosyalarina ayirarak daha okunabilir ve surdurulebilir bir yapi olusturdum.</p>
+</body>
+</html>

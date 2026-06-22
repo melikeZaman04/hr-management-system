@@ -5,6 +5,7 @@ System.
 
 ## Project Planning
 
+- `enterprise-anasayfa-aciklama.md`
 - `00-project-tracking.md`
 - `01-project-scope.md`
 - `02-system-modules.md`

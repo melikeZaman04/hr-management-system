@@ -18,6 +18,7 @@ import { EmptyState, ErrorState, SkeletonRow } from '../components/ui/State'
 import { Modal } from '../components/ui/Modal'
 import { Field, Input, Select } from '../components/ui/Field'
 import { downloadCsv } from '../lib/exportCsv'
+import anim from '../styles/animations.module.css'
 
 const DEVICE_TYPES = ['Laptop', 'Monitör', 'Telefon', 'Tablet', 'Mouse', 'Klavye', 'Kulaklık', 'Diğer']
 const DEVICE_ICON: Record<string, string> = { Telefon: 'phone', Monitör: 'cube', Monitor: 'cube', Mouse: 'cube' }
@@ -178,7 +179,7 @@ export function DevicesPage() {
               </thead>
               <tbody>
                 {availableDevices.slice(0, 5).map(d => (
-                  <tr key={d.id}>
+                  <tr key={d.id} className={anim.hoverRow}>
                     <td>
                       <div className="table__cell-primary">
                         <div style={{ width: 32, height: 32, borderRadius: 'var(--r-md)', background: 'var(--bg-sunken)', border: '1px solid var(--border-subtle)', display: 'grid', placeItems: 'center', color: 'var(--text-tertiary)' }}>
@@ -255,7 +256,7 @@ export function DevicesPage() {
               {filtered.map(d => {
                 const owner = d.assignee_id ? empMap.get(d.assignee_id) : null
                 return (
-                  <tr key={d.id}>
+                  <tr key={d.id} className={anim.hoverRow}>
                     <td>
                       <div className="table__cell-primary">
                         <div style={{ width: 32, height: 32, borderRadius: 'var(--r-md)', background: 'var(--bg-sunken)', border: '1px solid var(--border-subtle)', display: 'grid', placeItems: 'center', color: 'var(--text-tertiary)' }}>

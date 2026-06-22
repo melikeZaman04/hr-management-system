@@ -66,7 +66,7 @@ Projedeki frontend organizasyonu şu şekildedir:
 src/
   app/
     App.tsx
-    router.tsx
+    router.tsx 
 
   components/
     layout/

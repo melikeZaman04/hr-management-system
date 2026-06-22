@@ -9,6 +9,7 @@ import { EmployeeDetailPage } from '../pages/EmployeeDetailPage'
 import { EmployeesPage } from '../pages/EmployeesPage'
 import { LeaveRequestsPage } from '../pages/LeaveRequestsPage'
 import { LoginPage } from '../pages/LoginPage'
+import { LandingPage } from '../pages/LandingPage'
 import { SalaryCalculationPage } from '../pages/SalaryCalculationPage'
 import { ProfilePage } from '../pages/ProfilePage'
 
@@ -20,6 +21,11 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Navigate to="/dashboard" replace />,
+      },
+      {
+        // Public marketing landing page ("/" is taken by the dashboard redirect)
+        path: 'home',
+        element: <LandingPage />,
       },
       {
         path: 'login',

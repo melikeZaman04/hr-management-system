@@ -1,0 +1,5 @@
+.skeleton {
+  display: block;
+  background: var(--bg-hover);
+  border-radius: var(--r-sm);
+}

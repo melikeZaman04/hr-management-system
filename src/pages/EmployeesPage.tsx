@@ -14,6 +14,7 @@ import { EmptyState, ErrorState, SkeletonRow } from '../components/ui/State'
 import { Modal } from '../components/ui/Modal'
 import { Field, Input, Select, Textarea } from '../components/ui/Field'
 import { downloadCsv } from '../lib/exportCsv'
+import anim from '../styles/animations.module.css'
 
 const DEPARTMENTS = ['Mühendislik', 'Ürün', 'Tasarım', 'Satış', 'Pazarlama', 'İnsan Kaynakları', 'Finans']
 
@@ -219,7 +220,7 @@ export function EmployeesPage() {
             </thead>
             <tbody>
               {filtered.map(e => (
-                <tr key={e.id} onClick={() => navigate(`/employees/${e.id}`)}>
+                <tr key={e.id} className={anim.hoverRow} onClick={() => navigate(`/employees/${e.id}`)}>
                   <td>
                     <div className="table__cell-primary">
                       <Avatar name={e.full_name} size="md" />
@@ -234,7 +235,10 @@ export function EmployeesPage() {
                   <td style={{ textAlign: 'right' }} className="tabnum">{fmtCurrency(e.base_salary)}</td>
                   <td><StatusBadge status={e.employment_status} /></td>
                   <td onClick={ev => ev.stopPropagation()}>
-                    <Button variant="ghost" size="sm" icon="more" className="table__action" aria-label="Daha fazla" />
+                    <div className="row gap-2" style={{ justifyContent: 'flex-end' }}>
+                      <Button variant="ghost" size="sm" icon="edit" className="table__action" aria-label="Düzenle" onClick={() => navigate(`/employees/${e.id}`)} />
+                      <Button variant="ghost" size="sm" icon="more" className="table__action" aria-label="Daha fazla" />
+                    </div>
                   </td>
                 </tr>
               ))}

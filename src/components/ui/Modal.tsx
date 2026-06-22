@@ -1,4 +1,4 @@
-import type { ReactNode, CSSProperties } from 'react'
+import { useEffect, useState, type ReactNode, type CSSProperties } from 'react'
 import { Button } from './Button'
 
 interface ModalProps {
@@ -10,12 +10,31 @@ interface ModalProps {
   width?: number
 }
 
+const CLOSE_MS = 200
+
 export function Modal({ open, title, onClose, children, footer, width }: ModalProps) {
-  if (!open) return null
+  // Keep the modal mounted through its closing animation, then unmount.
+  const [mounted, setMounted] = useState(open)
+  const [closing, setClosing] = useState(false)
+
+  useEffect(() => {
+    if (open) {
+      const raf = requestAnimationFrame(() => { setMounted(true); setClosing(false) })
+      return () => cancelAnimationFrame(raf)
+    }
+    if (!mounted) return
+    const raf = requestAnimationFrame(() => setClosing(true))
+    const t = setTimeout(() => { setMounted(false); setClosing(false) }, CLOSE_MS)
+    return () => { cancelAnimationFrame(raf); clearTimeout(t) }
+  }, [open, mounted])
+
+  if (!mounted) return null
+
   const style: CSSProperties = width ? { maxWidth: width } : {}
+
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" style={style} onClick={e => e.stopPropagation()}>
+    <div className={`modal-backdrop${closing ? ' modal-backdrop--closing' : ''}`} onClick={onClose}>
+      <div className={`modal${closing ? ' modal--closing' : ''}`} style={style} onClick={e => e.stopPropagation()}>
         <div className="modal__head">
           <div className="modal__title">{title}</div>
           <Button variant="ghost" size="sm" icon="x" onClick={onClose} aria-label="Close" />

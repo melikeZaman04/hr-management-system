@@ -1,0 +1,7 @@
+.spinner {
+  display: inline-block;
+  border-radius: 999px;
+  border: 2px solid var(--border-default);
+  border-top-color: var(--accent);
+  flex-shrink: 0;
+}
