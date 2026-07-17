@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <title>frontend-baglanti-mulakat-soru-cevap</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: #172033;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.55;
+      background: #ffffff;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      padding-bottom: 10px;
+      color: #0f172a;
+      font-size: 22pt;
+      line-height: 1.15;
+      border-bottom: 2px solid #d7dce5;
+    }
+
+    h2 {
+      break-after: avoid;
+      margin: 22px 0 8px;
+      color: #1d4ed8;
+      font-size: 13.5pt;
+      line-height: 1.3;
+    }
+
+    h3 {
+      break-after: avoid;
+      margin: 18px 0 8px;
+      color: #334155;
+      font-size: 11.5pt;
+    }
+
+    p {
+      margin: 0 0 9px;
+    }
+
+    strong {
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    ul {
+      margin: 0 0 10px 18px;
+      padding: 0;
+    }
+
+    li {
+      margin: 2px 0;
+    }
+
+    code {
+      padding: 1px 4px;
+      border-radius: 4px;
+      color: #0f172a;
+      background: #eef2f7;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 9.5pt;
+    }
+
+    pre {
+      break-inside: avoid;
+      margin: 8px 0 12px;
+      padding: 10px 12px;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      border: 1px solid #dbe3ef;
+      border-radius: 6px;
+      background: #f8fafc;
+    }
+
+    pre code {
+      padding: 0;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+<h1>Frontend Baglanti ve React Mulakat Soru-Cevap Notlari</h1>
+<p>Bu dokuman, HRCore projesinde frontend tarafinin Supabase backend ile nasil baglandigini, React mimarisinin nasil kuruldugunu ve isveren tarafindan sorulabilecek teknik sorulara verilecek cevaplari icermektedir.</p>
+<h2>1. Bu projede frontend tarafinda hangi teknolojileri kullandin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Frontend tarafinda React, TypeScript, Vite ve React Router kullandim. React ile component tabanli arayuz gelistirdim. TypeScript ile veri tiplerini daha kontrollu hale getirdim. Vite sayesinde gelistirme ortami hizli calisti. React Router ile login, dashboard ve modul sayfalari arasindaki route yapisini kurdum.</p>
+<p>Backend baglantisi icin Supabase JS Client kullandim.</p>
+<h2>2. React uygulamasi Supabase'e nasil baglaniyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Supabase baglantisi <code>src/lib/supabaseClient.ts</code> dosyasinda merkezi olarak kuruldu. <code>.env.local</code> icindeki <code>VITE_SUPABASE_URL</code> ve <code>VITE_SUPABASE_ANON_KEY</code> degerleri okunuyor, sonra <code>createClient()</code> ile Supabase client olusturuluyor.</p>
+<p>Bu client daha sonra auth, employee, documents, devices, leave ve salary service dosyalarinda kullaniliyor.</p>
+<p>Akis su sekilde:</p>
+<pre><code>React component
+-&gt; feature service
+-&gt; supabase client
+-&gt; Supabase API
+-&gt; PostgreSQL / Auth / Storage</code></pre>
+<h2>3. Supabase sorgularini neden direkt componentlerin icinde yazmadin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Componentlerin icine direkt Supabase sorgusu yazsaydim UI kodu ile veri erisim kodu birbirine karisirdi. Bu da projeyi buyudukce bakimi zor bir hale getirirdi.</p>
+<p>Bu yuzden her is modulu icin ayri service dosyalari olusturdum. Ornegin:</p>
+<pre><code>EmployeesPage -&gt; employeeService -&gt; employees tablosu
+DocumentsPage -&gt; documentService -&gt; Storage + documents tablosu
+DevicesPage -&gt; deviceService -&gt; devices + device_assignments tablolari</code></pre>
+<p>Boylece sayfalar sadece ekrani ve kullanici etkilesimini yonetiyor. Veri cekme, insert, update, delete ve hata yakalama gibi islemler service katmaninda duruyor.</p>
+<h2>4. Bu service katmani frontend mimarisi acisindan ne kazandiriyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Service katmani UI ile veri erisimini ayiriyor. Bu sayede:</p>
+<ul><li>Component kodlari daha temiz kaliyor.</li><li>Supabase sorgulari tek yerde toplanmis oluyor.</li><li>Ayni veri fonksiyonu farkli sayfalarda tekrar kullanilabiliyor.</li><li>Hata yonetimi daha duzenli oluyor.</li><li>Ileride Supabase yerine farkli backend gelirse sayfalari komple degistirmek yerine service katmani guncellenebilir.</li></ul>
+<h2>5. Projede klasor yapisini nasil organize ettin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Projede moduler bir yapi kullandim:</p>
+<pre><code>src/app        -&gt; uygulama girisi ve router
+src/pages      -&gt; route seviyesindeki sayfalar
+src/features   -&gt; is modullerinin service ve logic dosyalari
+src/components -&gt; ortak UI ve layout componentleri
+src/layouts    -&gt; uygulama iskeleti
+src/lib        -&gt; supabaseClient ve yardimci fonksiyonlar
+src/styles     -&gt; global stiller</code></pre>
+<p>Bu yapi sayesinde her modulun sorumlulugu daha net oldu.</p>
+<h2>6. <code>pages</code> ve <code>features</code> klasorleri arasindaki fark nedir?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>pages</code> klasoru kullanicinin route olarak gordugu ekranlari tutar. Ornegin <code>EmployeesPage</code>, <code>DocumentsPage</code>, <code>DashboardPage</code>.</p>
+<p><code>features</code> klasoru ise bu sayfalarin kullandigi is mantigini ve Supabase servislerini tutar. Ornegin <code>employeeService</code>, <code>documentService</code>, <code>leaveRequestService</code>.</p>
+<p>Yani:</p>
+<pre><code>pages = ekrani gosterir
+features = veri ve is mantigini yonetir</code></pre>
+<h2>7. Auth state frontend'de nasil yonetiliyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Auth state <code>AuthProvider</code> icinde yonetiliyor. Uygulama acildiginda <code>supabase.auth.getSession()</code> ile mevcut oturum kontrol ediliyor. Login veya logout oldugunda <code>supabase.auth.onAuthStateChange()</code> ile degisimler dinleniyor.</p>
+<p>Session bilgisi, user bilgisi, profile bilgisi ve login/logout fonksiyonlari React Context ile uygulamaya saglaniyor. Componentler bu bilgilere <code>useAuth()</code> hook'u ile erisiyor.</p>
+<h2>8. Neden auth icin React Context kullandin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Auth bilgisi uygulamanin bircok yerinde gerekli. Header, Sidebar, ProtectedRoute ve sayfalar kullanicinin login durumunu veya rolunu bilmek zorunda.</p>
+<p>Bu bilgiyi prop olarak her yere tasimak yerine React Context kullandim. Boylece merkezi bir auth state olustu ve ihtiyac duyan componentler <code>useAuth()</code> ile bu state'e erisebildi.</p>
+<h2>9. Kullanici login olduktan sonra frontend'de ne oluyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Login formu email ve password'u <code>signIn()</code> fonksiyonuna gonderiyor. Bu fonksiyon Supabase Auth'a <code>signInWithPassword()</code> ile istek atiyor.</p>
+<p>Basarili login sonrasi Supabase session olusturuyor. <code>AuthProvider</code> session degisimini yakaliyor, sonra current profile bilgisini <code>profiles</code> tablosundan cekiyor. Bu profile icindeki role bilgisi frontend'de route ve menu davranislarini belirliyor.</p>
+<h2>10. Frontend kullanicinin rolunu nasil biliyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Frontend direkt Supabase Auth metadata'sina guvenmiyor. Login olan kullanicinin <code>auth.users.id</code> degeri ile <code>profiles</code> tablosundan profil kaydi cekiliyor.</p>
+<p>Bu profile kaydinda <code>role</code> alani var:</p>
+<pre><code>admin_hr
+manager
+employee</code></pre>
+<p>Frontend bu role bilgisini ekran erisimi ve menu davranislari icin kullaniyor.</p>
+<h2>11. <code>ProtectedRoute</code> frontend tarafinda nasil calisiyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>ProtectedRoute</code>, route seviyesinde kullanicinin login olup olmadigini ve rolunun o sayfaya uygun olup olmadigini kontrol ediyor.</p>
+<p>Kullanici login degilse login sayfasina yonlendiriliyor. Login ise ama rolu izin verilen roller arasinda degilse erisim yok mesaji gosteriliyor.</p>
+<p>Ornegin admin sayfasina sadece <code>admin_hr</code> girebilir. Employee rolundeki kullanici bu route'a girerse frontend bunu engeller.</p>
+<h2>12. ProtectedRoute guvenlik icin yeterli mi?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Hayir. ProtectedRoute frontend tarafinda kullanici deneyimini duzenler ama tek basina guvenlik saglamaz.</p>
+<p>Gercek guvenlik Supabase RLS tarafinda saglanir. Frontend route guard bypass edilse bile Supabase policy izin vermiyorsa kullanici veriye erisemez.</p>
+<p>Bu ayrim onemli:</p>
+<pre><code>ProtectedRoute = ekran korumasi
+Supabase RLS = veri korumasi</code></pre>
+<h2>13. Login sayfasinda hata ve loading durumlarini nasil yonettin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Login islemi async oldugu icin kullanici formu gonderdiginde loading state kullaniliyor. Supabase hata donerse hata mesaji kullaniciya gosteriliyor.</p>
+<p>Boylece kullanici yanlis sifre, eksik Supabase config veya baglanti problemi gibi durumlarda sessiz bir hata yerine anlasilir geri bildirim aliyor.</p>
+<h2>14. Frontend'de TypeScript kullanmanin faydasi ne oldu?</h2>
+<p><strong>Cevap:</strong></p>
+<p>TypeScript sayesinde Supabase'ten gelen verilerin uygulama icinde hangi alanlara sahip oldugunu daha net tanimladim.</p>
+<p>Ornegin <code>EmployeeListItem</code>, <code>Document</code>, <code>LeaveRequest</code>, <code>SalaryRecord</code> gibi type'lar olusturuldu. Bu sayede componentlerde yanlis alan kullanma, status degerlerini karistirma veya eksik property hatalari daha erken yakalaniyor.</p>
+<h2>15. Supabase tablolarini frontend'de nasil temsil ettin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Her service dosyasinda ilgili tabloya karsilik gelen TypeScript type'lari tanimladim.</p>
+<p>Ornek:</p>
+<pre><code>employees tablosu -&gt; EmployeeListItem / EmployeeDetail
+documents tablosu -&gt; Document
+leave_requests tablosu -&gt; LeaveRequest
+devices tablosu -&gt; Device
+salary_records tablosu -&gt; SalaryRecord</code></pre>
+<p>Bu type'lar frontend ile backend verisi arasinda sozlesme gibi calisiyor.</p>
+<h2>16. EmployeesPage veriyi nasil aliyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>EmployeesPage</code> direkt Supabase sorgusu yazmiyor. Sayfa, <code>employeeService.getEmployees()</code> fonksiyonunu cagiriyor.</p>
+<p>Bu fonksiyon Supabase <code>employees</code> tablosuna sorgu atiyor, gerekli alanlari seciyor ve isim sirasina gore listeyi donduruyor.</p>
+<p>Yani:</p>
+<pre><code>EmployeesPage
+-&gt; getEmployees()
+-&gt; supabase.from('employees').select(...)
+-&gt; UI'da tablo olarak goster</code></pre>
+<h2>17. DocumentsPage Supabase Storage ile nasil calisiyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>DocumentsPage</code>, dosya islemleri icin <code>documentService</code> fonksiyonlarini kullaniyor.</p>
+<p>Upload sirasinda:</p>
+<pre><code>file secilir
+-&gt; uploadEmployeeDocument() cagrilir
+-&gt; dosya Storage'a yuklenir
+-&gt; documents tablosuna metadata insert edilir
+-&gt; liste yenilenir</code></pre>
+<p>Download sirasinda:</p>
+<pre><code>documents kaydindan bucket/path alinir
+-&gt; getSignedUrl() cagrilir
+-&gt; Supabase gecici signed URL uretir
+-&gt; kullanici dosyayi indirir</code></pre>
+<h2>18. Dosya yukleme sirasinda frontend hangi kontrolleri yapiyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Frontend dosya secimi, dokuman tipi ve ilgili calisan secimi gibi kullanici girdilerini kontrol eder. Dosya adi service tarafinda guvenli hale getirilir. Sonra Supabase Storage'a upload edilir.</p>
+<p>Asil yetki kontrolu ise yine Supabase RLS ve Storage policy tarafindadir.</p>
+<h2>19. Download icin neden direkt storage path kullanilmiyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Cunku storage path tek basina public erisim linki degildir. Dosyalar hassas oldugu icin private tutulur.</p>
+<p>Download icin <code>getSignedUrl()</code> kullaniliyor. Bu fonksiyon kisa sureli, imzali bir URL uretir. Boylece dosya herkese acik kalmadan kullaniciya gecici indirme erisimi saglanir.</p>
+<h2>20. Frontend'de silme islemleri nasil yonetiliyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Silme islemi ilgili service fonksiyonu uzerinden yapiliyor. Ornegin dokuman silmede <code>deleteDocument()</code> cagriliyor.</p>
+<p>Bu fonksiyon once <code>documents</code> tablosundan metadata kaydini silmeye calisiyor. Gercekten satir silindiyse sonra Storage dosyasini siliyor.</p>
+<p>Frontend ise bu islemin sonucuna gore listeyi yeniliyor veya hata mesaji gosteriyor.</p>
+<h2>21. Hata yonetimini frontend'de nasil ele aldiniz?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Service fonksiyonlari Supabase'ten error donerse <code>throw new Error(error.message)</code> ile hatayi yukariya tasiyor.</p>
+<p>Sayfa componentleri bu hatalari yakalayip kullaniciya hata state'i olarak gosteriyor. Boylece verinin yuklenemedigi, kaydedilemedigi veya silinemedigi durumlar kullanici tarafinda anlasilir hale geliyor.</p>
+<h2>22. Loading state neden onemli?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Supabase istekleri async calistigi icin veri gelene kadar kullaniciya bos veya hatali ekran gostermek yerine loading state gosteriliyor.</p>
+<p>Projede tablolar yuklenirken skeleton row veya state box kullanildi. Bu kullanici deneyimini daha profesyonel hale getiriyor.</p>
+<h2>23. Dashboard verileri nasil geliyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Dashboard farkli servislerden ozet sayilar aliyor. Ornegin aktif calisan sayisi, bekleyen izin sayisi, cihaz sayisi ve dokuman sayisi gibi metrikler ilgili service fonksiyonlariyla Supabase'ten cekiliyor.</p>
+<p>Bu sayede Dashboard tek bir tabloya bagli degil, farkli modullerden ozet veri alan bir giris ekrani gibi calisiyor.</p>
+<h2>24. React Router yapisini nasil kurdun?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Route yapisi uygulamadaki sayfalari ayirmak icin kullanildi. Login, dashboard, employees, leave requests, salary, devices, documents ve profile gibi sayfalar route olarak tanimlandi.</p>
+<p>Korunmasi gereken route'lar <code>ProtectedRoute</code> altina alindi. Boylece login olmayan kullanici uygulama paneline giremedi.</p>
+<h2>25. Layout yapisi nasil calisiyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Panel ekranlari ortak bir layout icinde calisiyor. Sidebar, Header ve ana icerik alani AppLayout tarafindan saglaniyor.</p>
+<p>Bu sayede her sayfada ayni navigasyon ve panel iskeleti tekrar yazilmiyor. Sayfalar sadece kendi icerigine odaklaniyor.</p>
+<h2>26. Sidebar ve Header rol bilgisine gore degisiyor mu?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Evet, kullanicinin rolune gore gosterilecek menu ve aksiyonlar degisebilir. Auth context icinden gelen profile/role bilgisi kullanilarak kullaniciya uygun navigasyon deneyimi sunulur.</p>
+<p>Ancak burada tekrar vurgulamak gerekir: menu gizlemek gercek guvenlik degildir. Gercek veri erisimi Supabase RLS ile korunur.</p>
+<h2>27. Component yapisinda tekrar kullanilabilirlik nasil saglandi?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Ortak UI parcalari <code>components/ui</code> altinda toplandi. Button, Modal, Panel, Badge, StatCard, Field, Tabs gibi componentler farkli sayfalarda tekrar kullanildi.</p>
+<p>Bu sayede tasarim tutarliligi saglandi ve ayni UI kodu tekrar tekrar yazilmadi.</p>
+<h2>28. Form islemlerinde nelere dikkat ettin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Formlarda kullanici girdileri state ile takip edildi. Kaydetme islemleri async service fonksiyonlariyla yapildi. Basarili olursa liste veya detay verisi yenilendi. Hata olursa kullaniciya mesaj gosterildi.</p>
+<p>Ozellikle calisan olusturma, cihaz atama, izin talebi olusturma ve dokuman yukleme gibi islemlerde form state'i ile backend islemi ayrildi.</p>
+<h2>29. Frontend'de optimistic update kullandin mi?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Genel olarak kritik islemlerde Supabase sonucunu bekleyen daha guvenli bir yaklasim kullandim. Ozellikle silme, upload ve update gibi islemlerde backend basarili olmadan UI'in kesin olarak degismesi riskli olabilir.</p>
+<p>Bu MVP icin veri tutarliligini onceleyen bir yaklasim tercih ettim.</p>
+<h2>30. UI ile RLS hatalari arasindaki iliskiyi nasil yonettin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>RLS nedeniyle bir sorgu hata donebilir veya hic satir donmeyebilir. Service fonksiyonlari bu durumlari hata olarak yukariya tasiyor. Frontend de kullaniciya yetki veya islem hatasi mesaji gosteriyor.</p>
+<p>Ornegin dokuman silmede satir silinmediyse kullaniciya &quot;Bu kayit icin silme yetkiniz olmayabilir&quot; anlaminda mesaj veriliyor.</p>
+<h2>31. Supabase baglantisi yoksa frontend ne yapiyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>supabaseClient.ts</code> icinde env degerleri yoksa <code>supabase</code> null oluyor. Service fonksiyonlari bu durumda &quot;Supabase not configured&quot; hatasi firlatiyor.</p>
+<p>Bu sayede eksik config durumunda uygulama sessizce bozulmak yerine gelistiriciye anlasilir hata veriyor.</p>
+<h2>32. <code>.env.local</code> neden Git'e eklenmemeli?</h2>
+<p><strong>Cevap:</strong></p>
+<p><code>.env.local</code> icinde proje URL'si, anon key ve test kullanici bilgileri gibi ortama ozel degerler bulunabilir. Bu dosya Git'e eklenmemelidir.</p>
+<p>Ozellikle service role key, database sifresi veya test kullanici sifreleri kesinlikle repository'ye commit edilmemelidir.</p>
+<h2>33. Frontend tarafinda CSV export nasil dusunuldu?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Maaş gibi kayitlarda raporlama ihtiyaci oldugu icin CSV export yardimci fonksiyonu kullanildi. Veri Supabase'ten service araciligiyla cekilir, sonra frontend tarafinda CSV formatina donusturulup kullaniciya indirilir.</p>
+<p>Bu MVP icin yeterli bir cozumdur. Daha buyuk veri setlerinde server-side export daha dogru olabilir.</p>
+<h2>34. React tarafinda global state manager neden kullanmadin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Bu projede Redux veya Zustand gibi global state manager'a ihtiyac duymadim. Cunku global olmasi gereken ana state auth bilgisiydi ve bunu React Context ile yonettim.</p>
+<p>Modul verileri sayfa seviyesinde yuklenip kullanildi. Bu MVP icin daha sade ve anlasilir bir yapi sagladi.</p>
+<h2>35. Frontend performansi icin ne yaptin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Veri sorgularinda ihtiyac olan alanlari sectim, gereksiz tum kolonlari her yerde cekmemeye dikkat ettim. Loading/skeleton yapilariyla kullanici deneyimini iyilestirdim.</p>
+<p>Dashboard gibi alanlarda da sayi hesaplari icin <code>count</code> sorgulari kullanildi. Bu, tum veriyi cekip frontend'de saymaktan daha verimli bir yaklasimdir.</p>
+<h2>36. Componentlerde veri cekme akisini nasil kurdun?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Sayfa componentleri acildiginda ilgili service fonksiyonu cagriliyor. Veri yuklenirken loading state aktif oluyor. Basarili olursa state'e data yaziliyor, hata olursa error state'e mesaj yaziliyor.</p>
+<p>Genel akis:</p>
+<pre><code>mount
+-&gt; loading true
+-&gt; service fonksiyonu cagrilir
+-&gt; data veya error gelir
+-&gt; loading false
+-&gt; UI guncellenir</code></pre>
+<h2>37. Frontend'de veri filtreleme nasil yapiliyor?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Bazi modullerde filtreler service fonksiyonuna parametre olarak gonderiliyor. Ornegin dokumanlarda employee_id veya document_type filtresi, izin taleplerinde status veya leave_type filtresi kullaniliyor.</p>
+<p>Service fonksiyonu bu filtrelere gore Supabase sorgusuna <code>.eq()</code> kosullari ekliyor.</p>
+<h2>38. Frontend ile backend arasindaki sozlesmeyi nasil korudun?</h2>
+<p><strong>Cevap:</strong></p>
+<p>TypeScript type'lariyla korudum. Her tablo icin frontend'de type tanimladim. Bu type'lar hangi alanlarin geldigini, hangi status degerlerinin kullanildigini ve hangi fonksiyonun ne dondurdugunu netlestirdi.</p>
+<p>Bu sayede frontend ve Supabase tablo yapisi arasinda daha kontrollu bir bag kuruldu.</p>
+<h2>39. Bu frontend yapisinda en guclu taraf ne?</h2>
+<p><strong>Cevap:</strong></p>
+<p>En guclu taraf, UI ile veri erisiminin ayrilmis olmasi. Sayfalar sadece gorunum ve etkilesime odaklaniyor. Supabase ile konusan kodlar service dosyalarinda toplaniyor.</p>
+<p>Bu yapi projeyi daha okunabilir, test edilebilir ve gelistirilebilir hale getiriyor.</p>
+<h2>40. Bu frontend yapisinda gelistirilebilecek taraf ne?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Production seviyesinde React Query veya benzeri bir data fetching kutuphanesi eklenebilir. Boylece cache, refetch, mutation state ve background update gibi konular daha profesyonel yonetilebilir.</p>
+<p>Ayrica form validation icin Zod veya React Hook Form gibi araclar eklenebilir. Buyuk veri listelerinde pagination ve server-side filtering daha da guclendirilebilir.</p>
+<h2>41. React Query kullansaydin ne kazandirirdi?</h2>
+<p><strong>Cevap:</strong></p>
+<p>React Query kullansaydim server state yonetimi daha guclu olurdu. Loading, error, cache, refetch ve mutation durumlari daha standart hale gelirdi.</p>
+<p>Bu MVP'de manuel state yonetimi yeterliydi ama production'da React Query iyi bir iyilestirme olurdu.</p>
+<h2>42. Form validation'i production'da nasil iyilestirirdin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Production'da React Hook Form ve Zod kullanirdim. Zod ile form schema'larini tanimlayip hem frontend validation hem de tip guvenligini daha guclu hale getirirdim.</p>
+<p>Boylece email formatlari, zorunlu alanlar, maas degerleri, tarih araliklari gibi kontroller daha merkezi ve bakimi kolay olurdu.</p>
+<h2>43. Frontend tarafinda en kritik guvenlik yanilgisi ne olurdu?</h2>
+<p><strong>Cevap:</strong></p>
+<p>En kritik yanilgi, frontend'de buton veya menu gizlemenin gercek guvenlik oldugunu dusunmek olurdu.</p>
+<p>Frontend sadece kullanici deneyimini yonetir. Gercek guvenlik backend tarafinda, bu projede de Supabase RLS policy'lerinde saglanir.</p>
+<h2>44. Bu projede frontend-backend baglantisini tek cumleyle nasil aciklarsin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>React sayfalari kullanici arayuzunu yonetiyor, feature service dosyalari Supabase JS Client uzerinden Auth, PostgreSQL ve Storage servisleriyle konusuyor; rol ve veri guvenligi ise Supabase RLS tarafinda uygulanıyor.</p>
+<h2>45. Isveren sana &quot;Bu frontend production'a hazir mi?&quot; derse ne cevap verirsin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Bu haliyle MVP seviyesinde calisan, moduler ve Supabase ile entegre bir frontend. Production icin temel mimari dogru; auth, route guard, service katmani ve typed data modelleri var.</p>
+<p>Ama production'a cikmadan once React Query, daha guclu form validation, pagination, detayli testler, hata takip sistemi ve daha kapsamli accessibility kontrolleri eklerdim.</p>
+<h2>46. Frontend tarafinda test stratejin ne olurdu?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Component testleri icin React Testing Library kullanirdim. Kritik akislar icin login, role-based route access, dokuman upload/download ve calisan CRUD senaryolarini test ederdim.</p>
+<p>End-to-end test icin Playwright kullanarak kullanici akislarini gercek tarayici ortaminda dogrulardim.</p>
+<h2>47. Supabase hatalarini kullaniciya direkt gostermek dogru mu?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Gelistirme ortaminda detayli hata mesaji faydali olabilir. Ancak production'da Supabase'in ham hata mesajlarini direkt kullaniciya gostermek yerine daha kontrollu ve kullanici dostu mesajlar kullanmak daha dogru olur.</p>
+<p>Log tarafinda detay tutulabilir, UI tarafinda ise &quot;Bu islem gerceklestirilemedi&quot; gibi daha sade mesajlar gosterilebilir.</p>
+<h2>48. Frontend'de yetkiye gore butonlari gizledin mi?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Evet, kullanicinin rolune gore aksiyonlar ve sayfa erisimleri duzenlenebilir. Ornegin employee rolunun admin operasyonlarini gormemesi gerekir.</p>
+<p>Ama bu sadece UX icindir. Buton gizlemek tek basina guvenlik degildir. Supabase RLS yine asil karar mekanizmasidir.</p>
+<h2>49. Bu frontend mimarisini neden moduler sayiyorsun?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Cunku her is alani kendi dosya grubuna ayrildi. Auth islemleri auth feature'inda, calisan islemleri employees feature'inda, dokuman islemleri documents feature'inda tutuldu.</p>
+<p>Bu sayede yeni bir modul eklemek veya mevcut bir modulu degistirmek daha kolay hale geldi.</p>
+<h2>50. Bu frontend tarafinda en cok ne ogrendin?</h2>
+<p><strong>Cevap:</strong></p>
+<p>Frontend'in sadece ekran tasarimi olmadigini, backend ile saglam bir veri akisi kurmanin da frontend mimarisinin parcasi oldugunu ogrendim.</p>
+<p>Ozellikle AuthProvider, ProtectedRoute, service katmani, TypeScript modelleri ve Supabase RLS ayrimini birlikte dusunmek bu projede benim icin en onemli kazanmdi.</p>
+</body>
+</html>

@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 import { Icon } from './Icon'
+import { Skeleton } from '../Skeleton/Skeleton'
+import { Spinner } from '../Spinner/Spinner'
 
 interface EmptyStateProps {
   title: string
@@ -39,7 +41,7 @@ export function ErrorState({ title = "Couldn't load data", desc, action }: Error
 export function LoadingState({ label = 'Loading…' }: { label?: string }) {
   return (
     <div className="state">
-      <div className="spinner" />
+      <Spinner label={label} />
       <div className="state__desc">{label}</div>
     </div>
   )
@@ -49,7 +51,7 @@ export function SkeletonRow({ cols = 5 }: { cols?: number }) {
   return (
     <tr>
       {Array.from({ length: cols }).map((_, i) => (
-        <td key={i}><div className="skeleton" style={{ height: 12, width: i === 0 ? '70%' : '55%' }} /></td>
+        <td key={i}><Skeleton height={12} width={i === 0 ? '70%' : '55%'} /></td>
       ))}
     </tr>
   )

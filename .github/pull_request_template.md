@@ -1,19 +1,28 @@
-## Summary
+## Özet
 
+Bu PR neyi değiştiriyor?
 
-## Related Issue
+## Kapsam
 
+- 
 
-## Changes Made
+## Test / Kontrol
 
+- [ ] `npm run lint`
+- [ ] `npm run build`
+- [ ] Gerekliyse Supabase canlı kontrolü yapıldı
 
-## Screenshots if UI-related
+## Ekran Görüntüsü
 
+UI değişikliği varsa buraya ekran görüntüsü ekleyin.
+
+## Notlar
+
+Hocanın veya reviewer'ın özellikle bilmesi gereken bir durum var mı?
 
 ## Checklist
 
-- [ ] Code or documentation is clear
-- [ ] Related issue is linked
-- [ ] No secrets or API keys are committed
-- [ ] Documentation updated if needed
-- [ ] Tested locally if applicable
+- [ ] Değişiklik kapsamı küçük ve anlaşılır
+- [ ] Gizli anahtar, şifre veya `.env.local` commit edilmedi
+- [ ] README veya dokümantasyon gerekiyorsa güncellendi
+- [ ] PR açıklaması Türkçe ve anlaşılır

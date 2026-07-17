@@ -5,6 +5,7 @@ System.
 
 ## Project Planning
 
+- `enterprise-anasayfa-aciklama.md`
 - `00-project-tracking.md`
 - `01-project-scope.md`
 - `02-system-modules.md`
@@ -25,8 +26,3 @@ System.
 - `supabase/07-auth-login-setup.md`
 - `supabase/seed-employees.sql`
 - `supabase/dev-only-employee-read-policy.sql`
-
-## Issue History
-
-Issue planning drafts are stored in `github-issues/`. They are kept as a
-learning artifact because this project is being developed issue by issue.

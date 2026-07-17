@@ -17,59 +17,72 @@ interface NavSection {
 
 const NAV: Record<string, NavSection[]> = {
   admin_hr: [
-    { section: 'Workspace', items: [
-      { id: 'dashboard',  label: 'Dashboard',          icon: 'dashboard', to: '/dashboard' },
-      { id: 'employees',  label: 'Employees',           icon: 'users',     to: '/employees' },
-      { id: 'leave',      label: 'Leave Requests',      icon: 'calendar',  to: '/leave-requests' },
-    ]},
-    { section: 'Operations', items: [
-      { id: 'salary',     label: 'Salary Calculation',  icon: 'wallet',    to: '/salary-calculation' },
-      { id: 'devices',    label: 'Devices',             icon: 'laptop',    to: '/devices' },
-      { id: 'documents',  label: 'Documents',           icon: 'document',  to: '/documents' },
-    ]},
-    { section: 'System', items: [
-      { id: 'audit',      label: 'Audit Log',           icon: 'shield',    to: '/audit' },
-    ]},
+    {
+      section: 'Çalışma Alanı',
+      items: [
+        { id: 'dashboard', label: 'Panel', icon: 'dashboard', to: '/dashboard' },
+        { id: 'employees', label: 'Çalışanlar', icon: 'users', to: '/employees' },
+        { id: 'leave', label: 'İzin Talepleri', icon: 'calendar', to: '/leave-requests' },
+      ],
+    },
+    {
+      section: 'Operasyonlar',
+      items: [
+        { id: 'salary', label: 'Maaş Hesaplama', icon: 'wallet', to: '/salary-calculation' },
+        { id: 'devices', label: 'Cihazlar', icon: 'laptop', to: '/devices' },
+        { id: 'documents', label: 'Dokümanlar', icon: 'document', to: '/documents' },
+      ],
+    },
   ],
   manager: [
-    { section: 'Workspace', items: [
-      { id: 'dashboard',  label: 'Team Overview',       icon: 'dashboard', to: '/dashboard' },
-      { id: 'employees',  label: 'My Team',             icon: 'users',     to: '/employees' },
-      { id: 'leave',      label: 'Team Leave',          icon: 'calendar',  to: '/leave-requests' },
-    ]},
+    {
+      section: 'Çalışma Alanı',
+      items: [
+        { id: 'dashboard', label: 'Takım Özeti', icon: 'dashboard', to: '/dashboard' },
+        { id: 'employees', label: 'Takımım', icon: 'users', to: '/employees' },
+        { id: 'leave', label: 'Takım İzinleri', icon: 'calendar', to: '/leave-requests' },
+      ],
+    },
   ],
   employee: [
-    { section: 'Me', items: [
-      { id: 'dashboard',  label: 'Dashboard',           icon: 'dashboard', to: '/dashboard' },
-      { id: 'profile',    label: 'My Profile',          icon: 'user',      to: '/profile' },
-      { id: 'leave',      label: 'My Leave Requests',   icon: 'calendar',  to: '/leave-requests' },
-    ]},
-    { section: 'Resources', items: [
-      { id: 'devices',    label: 'My Devices',          icon: 'laptop',    to: '/devices' },
-      { id: 'documents',  label: 'My Documents',        icon: 'document',  to: '/documents' },
-    ]},
+    {
+      section: 'Ben',
+      items: [
+        { id: 'dashboard', label: 'Panel', icon: 'dashboard', to: '/dashboard' },
+        { id: 'profile', label: 'Profilim', icon: 'user', to: '/profile' },
+        { id: 'leave', label: 'İzin Taleplerim', icon: 'calendar', to: '/leave-requests' },
+      ],
+    },
+    {
+      section: 'Kaynaklar',
+      items: [
+        { id: 'devices', label: 'Cihazlarım', icon: 'laptop', to: '/devices' },
+        { id: 'documents', label: 'Dokümanlarım', icon: 'document', to: '/documents' },
+      ],
+    },
   ],
 }
 
 export function Sidebar() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
 
-  const role = 'admin_hr'
-  const sections = NAV[role] ?? NAV.admin_hr
+  const role = profile?.role ?? 'employee'
+  const sections = NAV[role] ?? NAV.employee
 
-  const displayName = user?.user_metadata?.full_name as string | undefined
-    ?? user?.email?.split('@')[0] ?? 'User'
+  const displayName = profile?.full_name
+    ?? user?.user_metadata?.full_name as string | undefined
+    ?? user?.email?.split('@')[0] ?? 'Kullanıcı'
   const email = user?.email ?? ''
 
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">
-        <div className="sidebar__brand-mark">N</div>
+        <div className="sidebar__brand-mark">HRC</div>
         <div>
-          <div className="sidebar__brand-name">Northwind HR</div>
-          <div className="sidebar__brand-org">Acme Industries</div>
+          <div className="sidebar__brand-name">HRCore</div>
+          <div className="sidebar__brand-org">People Operations</div>
         </div>
       </div>
 

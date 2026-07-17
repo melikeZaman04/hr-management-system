@@ -1,27 +1,29 @@
 ---
-name: Bug Report
-about: Report a bug or unexpected behavior
-title: ""
+name: Hata Bildirimi
+about: Uygulamadaki beklenmeyen bir davranışı bildirmek için
+title: "[Bug]: "
 labels: "type: bug"
 assignees: ""
 ---
 
-## Bug Description
+## Hata Açıklaması
 
 
-## Steps to Reproduce
+## Tekrar Üretme Adımları
 
 1. 
 
-## Expected Behavior
+## Beklenen Davranış
 
 
-## Actual Behavior
+## Gerçekleşen Davranış
 
 
-## Screenshots / Logs
+## Ekran Görüntüsü / Log
 
 
-## Environment
+## Ortam
 
-
+- Tarayıcı:
+- Kullanıcı rolü:
+- İlgili sayfa:

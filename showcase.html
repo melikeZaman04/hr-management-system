@@ -1,0 +1,1083 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HRCore | Interaktif Proje Vitrini</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #667085;
+      --line: #dde4ec;
+      --paper: #f7f9fc;
+      --white: #ffffff;
+      --navy: #203a55;
+      --teal: #0f766e;
+      --amber: #b7791f;
+      --green: #15803d;
+      --red: #b42318;
+      --shadow: 0 18px 55px rgba(24, 39, 75, 0.12);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.55;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 14px clamp(18px, 4vw, 56px);
+      border-bottom: 1px solid rgba(221, 228, 236, 0.9);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 7px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--navy), var(--teal));
+      box-shadow: 0 8px 22px rgba(15, 118, 110, 0.24);
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav a {
+      padding: 8px 10px;
+      border-radius: 6px;
+    }
+
+    .nav a:hover {
+      color: var(--ink);
+      background: #eef4f8;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.03fr) minmax(340px, 0.97fr);
+      gap: clamp(28px, 5vw, 72px);
+      align-items: center;
+      min-height: calc(100vh - 64px);
+      padding: clamp(40px, 7vw, 86px) clamp(18px, 4vw, 56px) 48px;
+      background:
+        radial-gradient(circle at 85% 10%, rgba(15, 118, 110, 0.15), transparent 34%),
+        linear-gradient(180deg, #ffffff 0%, #f4f8fb 100%);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.5);
+      animation: pulse 1.7s infinite;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 0;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: 0.98;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 690px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2vw, 21px);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .btn {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 16px;
+      border: 1px solid transparent;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: 750;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: var(--navy);
+      box-shadow: 0 12px 28px rgba(32, 58, 85, 0.22);
+    }
+
+    .btn-secondary {
+      color: var(--ink);
+      background: #fff;
+      border-color: var(--line);
+    }
+
+    .device {
+      overflow: hidden;
+      border: 1px solid #d6e0ea;
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .device-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 15px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfdff;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dots span {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #cbd5e1;
+    }
+
+    .device-body {
+      display: grid;
+      grid-template-columns: 145px 1fr;
+      min-height: 430px;
+    }
+
+    .side {
+      padding: 18px 12px;
+      border-right: 1px solid var(--line);
+      background: #10243a;
+      color: #d7e3ee;
+    }
+
+    .side-title {
+      margin-bottom: 18px;
+      font-size: 12px;
+      color: #8fb5c6;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .side-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      margin-bottom: 6px;
+      padding: 9px 8px;
+      border: 0;
+      border-radius: 6px;
+      color: inherit;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .side-item.active,
+    .side-item:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.11);
+    }
+
+    .screen {
+      min-width: 0;
+      padding: 22px;
+    }
+
+    .screen-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .screen h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .screen p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      min-height: 94px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .table {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1.2fr 0.85fr 0.75fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .row:last-child {
+      border-bottom: 0;
+    }
+
+    .row.head {
+      color: var(--muted);
+      background: #f8fafc;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 750;
+      background: #eef6f5;
+      color: var(--teal);
+    }
+
+    .section {
+      padding: 76px clamp(18px, 4vw, 56px);
+    }
+
+    .section.alt {
+      background: #fff;
+      border-block: 1px solid var(--line);
+    }
+
+    .section-headline {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 28px;
+      margin-bottom: 28px;
+    }
+
+    .section h2 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.05;
+    }
+
+    .section .summary {
+      max-width: 560px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 0 10px 26px rgba(24, 39, 75, 0.05);
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .module-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--muted);
+      background: #fff;
+      cursor: pointer;
+      font-weight: 750;
+    }
+
+    .tab.active {
+      color: #fff;
+      border-color: var(--navy);
+      background: var(--navy);
+    }
+
+    .module-panel {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .feature-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: var(--muted);
+    }
+
+    .feature-list li::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      flex: 0 0 auto;
+      margin-top: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    .flow-step {
+      position: relative;
+      min-height: 150px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .flow-step::after {
+      content: ">";
+      position: absolute;
+      top: 50%;
+      right: -10px;
+      color: var(--muted);
+      transform: translateY(-50%);
+      font-weight: 900;
+    }
+
+    .flow-step:last-child::after {
+      display: none;
+    }
+
+    .flow-step span {
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .flow-step strong {
+      display: block;
+      margin: 8px 0;
+    }
+
+    .flow-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .role-matrix {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .role-row {
+      display: grid;
+      grid-template-columns: 1.2fr repeat(3, minmax(125px, 1fr));
+      min-width: 660px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .role-row:last-child {
+      border-bottom: 0;
+    }
+
+    .role-cell {
+      padding: 14px 16px;
+      border-right: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .role-cell:last-child {
+      border-right: 0;
+    }
+
+    .role-row.header .role-cell {
+      color: var(--muted);
+      background: #f8fafc;
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .ok { color: var(--green); font-weight: 850; }
+    .warn { color: var(--amber); font-weight: 850; }
+    .no { color: var(--red); font-weight: 850; }
+
+    .stack {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .code {
+      overflow: auto;
+      margin: 0;
+      padding: 18px;
+      border-radius: 8px;
+      color: #d8e7f2;
+      background: #10243a;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .doc-links {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .doc-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      transition: transform 160ms ease, border-color 160ms ease;
+    }
+
+    .doc-link:hover {
+      transform: translateY(-2px);
+      border-color: #9fb7c8;
+    }
+
+    .footer {
+      padding: 30px clamp(18px, 4vw, 56px);
+      color: #d8e7f2;
+      background: #10243a;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 40;
+      max-width: min(360px, calc(100vw - 36px));
+      padding: 13px 15px;
+      border-radius: 7px;
+      color: #fff;
+      background: var(--navy);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @keyframes pulse {
+      70% { box-shadow: 0 0 0 11px rgba(21, 128, 61, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(21, 128, 61, 0); }
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .module-panel,
+      .stack {
+        grid-template-columns: 1fr;
+      }
+
+      .cards,
+      .doc-links {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-step::after {
+        display: none;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 3px;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      .device-body {
+        grid-template-columns: 1fr;
+      }
+
+      .side {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .side-title {
+        display: none;
+      }
+
+      .side-item {
+        min-width: 136px;
+        margin-bottom: 0;
+      }
+
+      .mini-grid,
+      .cards,
+      .doc-links {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .section-headline {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="HRCore ana sayfa">
+      <span class="mark">H</span>
+      <span>HRCore Proje Vitrini</span>
+    </a>
+    <nav class="nav" aria-label="Sayfa bolumleri">
+      <a href="#demo">Demo</a>
+      <a href="#modules">Modüller</a>
+      <a href="#architecture">Mimari</a>
+      <a href="#roles">Roller</a>
+      <a href="#docs">Teslim</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div>
+        <div class="eyebrow"><span class="pulse"></span> MVP seviyesinde çalışan HR sistemi</div>
+        <h1>İnsan kaynakları operasyonları için tek panel.</h1>
+        <p class="lead">
+          HRCore; çalışan kayıtları, izin süreçleri, maaş kesintileri, cihaz zimmetleri ve doküman yönetimini React, TypeScript ve Supabase altyapısı ile bir araya getiren web tabanlı bir yönetim uygulamasıdır.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#demo">İnteraktif demoyu gör</a>
+          <button class="btn btn-secondary" type="button" data-copy="npm install&#10;npm run dev">Çalıştırma komutunu kopyala</button>
+        </div>
+      </div>
+
+      <div class="device" id="demo">
+        <div class="device-top">
+          <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          <strong>localhost:5173/dashboard</strong>
+        </div>
+        <div class="device-body">
+          <aside class="side" aria-label="Demo modulleri">
+            <div class="side-title">Canlı görünüm</div>
+            <button class="side-item active" type="button" data-screen="dashboard">Dashboard</button>
+            <button class="side-item" type="button" data-screen="employees">Çalışanlar</button>
+            <button class="side-item" type="button" data-screen="leave">İzinler</button>
+            <button class="side-item" type="button" data-screen="devices">Cihazlar</button>
+            <button class="side-item" type="button" data-screen="documents">Dokümanlar</button>
+          </aside>
+          <section class="screen" aria-live="polite">
+            <div class="screen-head">
+              <div>
+                <h2 id="screenTitle">Dashboard</h2>
+                <p id="screenDesc">Rol bazlı özetler, son aktiviteler ve operasyon metrikleri.</p>
+              </div>
+              <span class="badge" id="screenBadge">Admin / HR</span>
+            </div>
+            <div class="mini-grid" id="metrics"></div>
+            <div class="table" id="table"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="section-headline">
+        <h2>İşverenin hızlıca anlayacağı güçlü taraflar.</h2>
+        <p class="summary">Bu vitrin projenin sadece ekran tasarımı olmadığını gösterir: rol bazlı erişim, gerçek servis katmanı, Supabase Auth, PostgreSQL, Storage ve RLS düşünülmüş durumda.</p>
+      </div>
+      <div class="cards">
+        <article class="card">
+          <h3>Gerçek iş akışları</h3>
+          <p>Çalışan oluşturma, izin onayı, cihaz atama, doküman yükleme ve CSV dışa aktarma gibi uçtan uca süreçler.</p>
+        </article>
+        <article class="card">
+          <h3>Rol bazlı ürün mantığı</h3>
+          <p>Admin/HR, manager ve employee profilleri için farklı veri görünürlüğü ve güvenli erişim modeli.</p>
+        </article>
+        <article class="card">
+          <h3>Teslim edilebilir yapı</h3>
+          <p>README, akademik raporlar, Supabase kontrol scriptleri ve production build komutları ile tamamlanmış proje düzeni.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="modules">
+      <div class="section-headline">
+        <h2>Modül gezgini.</h2>
+        <p class="summary">Aşağıdaki sekmeler işverene projenin kapsamını birkaç saniyede anlatmak için hazırlandı.</p>
+      </div>
+      <div class="module-tabs" id="moduleTabs"></div>
+      <div class="module-panel">
+        <article class="card">
+          <h3 id="moduleTitle"></h3>
+          <p id="moduleText"></p>
+          <ul class="feature-list" id="moduleFeatures"></ul>
+        </article>
+        <pre class="code" id="moduleCode"></pre>
+      </div>
+    </section>
+
+    <section class="section alt" id="architecture">
+      <div class="section-headline">
+        <h2>Mimari akış.</h2>
+        <p class="summary">Frontend tarafı servis katmanı üzerinden Supabase API ile konuşur. Yetki kontrolünün ana zemini Supabase RLS kurallarıdır.</p>
+      </div>
+      <div class="flow">
+        <div class="flow-step"><span>01</span><strong>React Sayfası</strong><p>Route bazlı ekranlar kullanıcı işlemine göre servis çağırır.</p></div>
+        <div class="flow-step"><span>02</span><strong>Feature Service</strong><p>Çalışan, izin, cihaz, doküman ve maaş iş mantığı ayrılır.</p></div>
+        <div class="flow-step"><span>03</span><strong>Supabase Client</strong><p>Auth oturumu ve API erişimi merkezi client ile yönetilir.</p></div>
+        <div class="flow-step"><span>04</span><strong>PostgreSQL / Storage</strong><p>Veriler tabloda, çalışan dosyaları private storage alanında tutulur.</p></div>
+        <div class="flow-step"><span>05</span><strong>RLS Güvenliği</strong><p>Frontend guard deneyimi iyileştirir; gerçek yetki kontrolü backend tarafındadır.</p></div>
+      </div>
+    </section>
+
+    <section class="section" id="roles">
+      <div class="section-headline">
+        <h2>Rol bazlı erişim matrisi.</h2>
+        <p class="summary">Mülakatta anlatması kolay bir ayrım: herkes aynı uygulamaya girer, fakat gördüğü veri ve yapabildiği işlem role göre değişir.</p>
+      </div>
+      <div class="role-matrix">
+        <div class="role-row header">
+          <div class="role-cell">Yetkinlik</div>
+          <div class="role-cell">Admin / HR</div>
+          <div class="role-cell">Manager</div>
+          <div class="role-cell">Employee</div>
+        </div>
+        <div class="role-row">
+          <div class="role-cell">Çalışan kayıtlarını yönetme</div>
+          <div class="role-cell ok">Tam erişim</div>
+          <div class="role-cell warn">Ekip odaklı</div>
+          <div class="role-cell no">Yok</div>
+        </div>
+        <div class="role-row">
+          <div class="role-cell">İzin talebi oluşturma</div>
+          <div class="role-cell ok">Var</div>
+          <div class="role-cell ok">Var</div>
+          <div class="role-cell ok">Var</div>
+        </div>
+        <div class="role-row">
+          <div class="role-cell">İzin onay / red akışı</div>
+          <div class="role-cell ok">Var</div>
+          <div class="role-cell warn">Ekip için</div>
+          <div class="role-cell no">Yok</div>
+        </div>
+        <div class="role-row">
+          <div class="role-cell">Cihaz ve doküman yönetimi</div>
+          <div class="role-cell ok">Tam erişim</div>
+          <div class="role-cell warn">Görüntüleme</div>
+          <div class="role-cell warn">Kendi kayıtları</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt">
+      <div class="section-headline">
+        <h2>Teknoloji ve komutlar.</h2>
+        <p class="summary">Proje modern frontend yapısı ile hazırlanmış ve Supabase tarafındaki canlı kontroller için yardımcı scriptler içerir.</p>
+      </div>
+      <div class="stack">
+        <article class="card">
+          <h3>Stack</h3>
+          <ul class="feature-list">
+            <li>React 19, TypeScript, Vite</li>
+            <li>React Router ile route yönetimi</li>
+            <li>Supabase Auth, PostgreSQL, Storage ve RLS</li>
+            <li>ESLint, production build ve preview komutları</li>
+          </ul>
+        </article>
+        <pre class="code">npm install
+npm run dev
+npm run lint
+npm run build
+
+node scripts/supabase-live-check.mjs
+node scripts/supabase-auth-check.mjs admin_hr
+node scripts/supabase-rls-boundary-check.mjs</pre>
+      </div>
+    </section>
+
+    <section class="section" id="docs">
+      <div class="section-headline">
+        <h2>Teslim dosyaları.</h2>
+        <p class="summary">HTML vitrin yanında teknik raporlar ve soru-cevap dokümanları da işverene destek materyali olarak gösterilebilir.</p>
+      </div>
+      <div class="doc-links">
+        <a class="doc-link" href="README.md"><strong>README</strong><span>→</span></a>
+        <a class="doc-link" href="docs/react-akademik-rapor.md"><strong>React Raporu</strong><span>→</span></a>
+        <a class="doc-link" href="docs/backend-supabase-akademik-rapor.md"><strong>Backend / Supabase</strong><span>→</span></a>
+        <a class="doc-link" href="docs/frontend-baglanti-mulakat-soru-cevap.html"><strong>Frontend Soru Cevap</strong><span>→</span></a>
+        <a class="doc-link" href="docs/backend-supabase-mulakat-soru-cevap.html"><strong>Backend Soru Cevap</strong><span>→</span></a>
+        <a class="doc-link" href="dist/"><strong>Production Build</strong><span>→</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <strong>HRCore</strong>
+    <span> · React + TypeScript + Supabase ile geliştirilmiş insan kaynakları yönetim sistemi.</span>
+  </footer>
+
+  <div class="toast" id="toast">Kopyalandı.</div>
+
+  <script>
+    const screens = {
+      dashboard: {
+        title: 'Dashboard',
+        desc: 'Rol bazlı özetler, son aktiviteler ve operasyon metrikleri.',
+        badge: 'Admin / HR',
+        metrics: [
+          ['Aktif çalışan', '42'],
+          ['Atanmış cihaz', '28'],
+          ['Kayıtlı doküman', '116']
+        ],
+        rows: [
+          ['Son aktivite', '6 doküman eklendi', 'Bugün'],
+          ['Cihaz durumu', '1 yeni zimmet', 'Bu hafta'],
+          ['İzin gündemi', '3 bekleyen talep', 'Aksiyon']
+        ]
+      },
+      employees: {
+        title: 'Çalışan Yönetimi',
+        desc: 'Çalışan listeleme, oluşturma ve detay ekranları.',
+        badge: 'CRUD',
+        metrics: [
+          ['Aktif kayıt', '42'],
+          ['Departman', '7'],
+          ['Profil eşleşmesi', 'Auth']
+        ],
+        rows: [
+          ['Ayşe Demir', 'Product', 'Aktif'],
+          ['Burak Kaya', 'Engineering', 'Aktif'],
+          ['Selin Yılmaz', 'Finance', 'İzinli']
+        ]
+      },
+      leave: {
+        title: 'İzin Talepleri',
+        desc: 'Talep oluşturma, onaylama, reddetme ve durum takibi.',
+        badge: 'Workflow',
+        metrics: [
+          ['Bekleyen', '3'],
+          ['Onaylanan', '18'],
+          ['Reddedilen', '2']
+        ],
+        rows: [
+          ['Yıllık izin', 'Beklemede', 'Manager'],
+          ['Hastalık izni', 'Onaylandı', 'HR'],
+          ['Ücretsiz izin', 'Reddedildi', 'HR']
+        ]
+      },
+      devices: {
+        title: 'Cihaz Envanteri',
+        desc: 'Laptop, telefon ve ekipman zimmet / iade akışları.',
+        badge: 'Inventory',
+        metrics: [
+          ['Toplam cihaz', '35'],
+          ['Zimmetli', '28'],
+          ['Boşta', '7']
+        ],
+        rows: [
+          ['MacBook Pro', 'Burak Kaya', 'Zimmetli'],
+          ['ThinkPad T14', 'Ayşe Demir', 'Zimmetli'],
+          ['iPhone 15', 'Depo', 'Boşta']
+        ]
+      },
+      documents: {
+        title: 'Doküman Yönetimi',
+        desc: 'Supabase Storage ile çalışan dosyası yükleme, indirme ve silme.',
+        badge: 'Private Storage',
+        metrics: [
+          ['Doküman', '116'],
+          ['Kategori', '5'],
+          ['Erişim', 'RLS']
+        ],
+        rows: [
+          ['Sözleşme.pdf', 'Personel', 'Private'],
+          ['Kimlik.pdf', 'Uyum', 'Private'],
+          ['Sertifika.pdf', 'Eğitim', 'Private']
+        ]
+      }
+    };
+
+    const modules = [
+      {
+        key: 'employees',
+        name: 'Çalışanlar',
+        title: 'Çalışan yaşam döngüsü',
+        text: 'HR ekibinin çalışan kayıtlarını tek panelden yönetmesi için temel modül.',
+        features: ['Listeleme, filtreleme ve detay görüntüleme', 'Yeni çalışan oluşturma', 'Profil ve manager ilişkisi kurma'],
+        code: 'src/features/employees/employeeService.ts\\nsrc/pages/EmployeesPage.tsx\\nsrc/pages/EmployeeDetailPage.tsx'
+      },
+      {
+        key: 'leave',
+        name: 'İzin',
+        title: 'Onay akışlı izin yönetimi',
+        text: 'Çalışan taleplerinin rol bazlı olarak oluşturulup onaylanmasını sağlar.',
+        features: ['Pending / approved / rejected durumları', 'Manager ve HR aksiyonları', 'Kişisel izin özeti'],
+        code: 'src/features/leave/leaveRequestService.ts\\nsrc/pages/LeaveRequestsPage.tsx\\nSupabase RLS policies'
+      },
+      {
+        key: 'salary',
+        name: 'Maaş',
+        title: 'Kesinti kayıtları ve CSV çıktı',
+        text: 'Maaş kesintilerini kayıt altına alır ve dışa aktarma sürecini kolaylaştırır.',
+        features: ['Kesinti sebebi ve tutar kaydı', 'CSV export helper', 'Finans/HR raporlama desteği'],
+        code: 'src/features/salary/salaryService.ts\\nsrc/pages/SalaryCalculationPage.tsx\\nsrc/lib/exportCsv.ts'
+      },
+      {
+        key: 'devices',
+        name: 'Cihaz',
+        title: 'Zimmet ve iade operasyonu',
+        text: 'Şirket cihazlarının sahiplik durumunu ve iade akışlarını takip eder.',
+        features: ['Cihaz oluşturma', 'Çalışana atama', 'İade alıp envantere döndürme'],
+        code: 'src/features/devices/deviceService.ts\\nsrc/pages/DevicesPage.tsx\\nassigned / available status'
+      },
+      {
+        key: 'documents',
+        name: 'Doküman',
+        title: 'Private çalışan dokümanları',
+        text: 'Çalışan belgelerini Supabase Storage üzerinde güvenli biçimde yönetir.',
+        features: ['Yükleme, indirme ve silme', 'Çalışan bazlı listeleme', 'Storage + RLS güvenlik yaklaşımı'],
+        code: 'src/features/documents/documentService.ts\\nsrc/pages/DocumentsPage.tsx\\nSupabase Storage bucket'
+      }
+    ];
+
+    const metricsEl = document.getElementById('metrics');
+    const tableEl = document.getElementById('table');
+    const titleEl = document.getElementById('screenTitle');
+    const descEl = document.getElementById('screenDesc');
+    const badgeEl = document.getElementById('screenBadge');
+
+    function renderScreen(key) {
+      const data = screens[key];
+      titleEl.textContent = data.title;
+      descEl.textContent = data.desc;
+      badgeEl.textContent = data.badge;
+      metricsEl.innerHTML = data.metrics.map(([label, value]) => (
+        '<div class="metric"><span>' + label + '</span><strong>' + value + '</strong></div>'
+      )).join('');
+      tableEl.innerHTML = '<div class="row head"><div>Kayıt</div><div>Durum</div><div>Zaman</div></div>' +
+        data.rows.map((row) => '<div class="row"><div>' + row[0] + '</div><div>' + row[1] + '</div><div><span class="badge">' + row[2] + '</span></div></div>').join('');
+    }
+
+    document.querySelectorAll('[data-screen]').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-screen]').forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+        renderScreen(button.dataset.screen);
+      });
+    });
+
+    const moduleTabs = document.getElementById('moduleTabs');
+    const moduleTitle = document.getElementById('moduleTitle');
+    const moduleText = document.getElementById('moduleText');
+    const moduleFeatures = document.getElementById('moduleFeatures');
+    const moduleCode = document.getElementById('moduleCode');
+
+    function renderModule(index) {
+      const item = modules[index];
+      moduleTitle.textContent = item.title;
+      moduleText.textContent = item.text;
+      moduleFeatures.innerHTML = item.features.map((feature) => '<li>' + feature + '</li>').join('');
+      moduleCode.textContent = item.code;
+      document.querySelectorAll('.tab').forEach((tab, tabIndex) => {
+        tab.classList.toggle('active', tabIndex === index);
+      });
+    }
+
+    modules.forEach((item, index) => {
+      const button = document.createElement('button');
+      button.className = 'tab' + (index === 0 ? ' active' : '');
+      button.type = 'button';
+      button.textContent = item.name;
+      button.addEventListener('click', () => renderModule(index));
+      moduleTabs.appendChild(button);
+    });
+
+    const toast = document.getElementById('toast');
+    document.querySelectorAll('[data-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(button.dataset.copy);
+          toast.textContent = 'Çalıştırma komutu kopyalandı.';
+        } catch {
+          toast.textContent = 'Komut: npm install / npm run dev';
+        }
+        toast.classList.add('show');
+        window.setTimeout(() => toast.classList.remove('show'), 2200);
+      });
+    });
+
+    renderScreen('dashboard');
+    renderModule(0);
+  </script>
+</body>
+</html>
