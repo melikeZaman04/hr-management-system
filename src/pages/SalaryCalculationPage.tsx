@@ -1,8 +1,8 @@
-﻿import { useEffect, useState } from 'react'
+﻿import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { getEmployees, type EmployeeListItem } from '../features/employees/employeeService'
 import {
-  calcSalary, saveSalaryRecord, getSalaryRecords,
+  calcSalary, saveSalaryRecord, getSalaryRecords, getApprovedUnpaidLeaveDaysForPeriod,
   type SalaryRecord,
 } from '../features/salary/salaryService'
 import { useAuth } from '../features/auth/useAuth'
@@ -33,6 +33,10 @@ export function SalaryCalculationPage() {
   const [month, setMonth] = useState(new Date().getMonth() + 1)
   const [year, setYear] = useState(new Date().getFullYear())
   const [unpaidDays, setUnpaidDays] = useState(0)
+  const [unpaidDaysLoading, setUnpaidDaysLoading] = useState(false)
+  const [unpaidDaysError, setUnpaidDaysError] = useState<string | null>(null)
+  const [overtimeHours, setOvertimeHours] = useState(0)
+  const [overtimeRateOverride, setOvertimeRateOverride] = useState('')
 
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -40,6 +44,7 @@ export function SalaryCalculationPage() {
 
   const [records, setRecords] = useState<SalaryRecord[]>([])
   const [recordsLoading, setRecordsLoading] = useState(true)
+  const unpaidFetchSeq = useRef(0)
 
   const empMap = new Map(employees.map(e => [e.id, e]))
 
@@ -57,9 +62,49 @@ export function SalaryCalculationPage() {
 
   const emp = employees.find(e => e.id === empId)
   const base = emp?.base_salary ?? 0
-  const { monthlyBase, daily, deduction, total } = calcSalary(base, unpaidDays)
+  const hourlyPreview = calcSalary(base, unpaidDays).hourly
+  const overtimeHourlyRate = overtimeRateOverride.trim()
+    ? Math.max(0, Number(overtimeRateOverride))
+    : hourlyPreview
+  const { monthlyBase, daily, hourly, overtimeAmount, deduction, total } = calcSalary(
+    base,
+    unpaidDays,
+    overtimeHours,
+    overtimeHourlyRate,
+  )
 
   const activeEmployees = employees.filter(e => e.employment_status === 'active')
+
+  const loadApprovedUnpaidDays = useCallback(async () => {
+    const seq = unpaidFetchSeq.current + 1
+    unpaidFetchSeq.current = seq
+
+    if (!empId) {
+      setUnpaidDays(0)
+      setUnpaidDaysError(null)
+      setUnpaidDaysLoading(false)
+      return
+    }
+
+    setUnpaidDaysLoading(true)
+    setUnpaidDaysError(null)
+
+    try {
+      const days = await getApprovedUnpaidLeaveDaysForPeriod(empId, month, year)
+      if (unpaidFetchSeq.current === seq) setUnpaidDays(days)
+    } catch (err) {
+      if (unpaidFetchSeq.current === seq) {
+        setUnpaidDays(0)
+        setUnpaidDaysError(err instanceof Error ? err.message : 'Ücretsiz izin günleri alınamadı.')
+      }
+    } finally {
+      if (unpaidFetchSeq.current === seq) setUnpaidDaysLoading(false)
+    }
+  }, [empId, month, year])
+
+  useEffect(() => {
+    void Promise.resolve().then(loadApprovedUnpaidDays)
+  }, [loadApprovedUnpaidDays])
 
   async function handleSave() {
     if (!empId) return
@@ -73,10 +118,18 @@ export function SalaryCalculationPage() {
         base_salary: base,
         unpaid_leave_days: unpaidDays,
         deduction_amount: deduction,
+        overtime_hours: overtimeHours,
+        overtime_hourly_rate: overtimeHourlyRate,
+        overtime_amount: overtimeAmount,
         calculated_salary: total,
         calculated_by: profile?.id ?? null,
       })
-      setRecords(prev => [record, ...prev])
+      setRecords(prev => [{
+        ...record,
+        overtime_hours: overtimeHours,
+        overtime_hourly_rate: overtimeHourlyRate,
+        overtime_amount: overtimeAmount,
+      }, ...prev])
       setLastSaved(new Date().toISOString())
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : 'Hesaplama kaydedilemedi.')
@@ -88,7 +141,7 @@ export function SalaryCalculationPage() {
   function exportSalaryRecords() {
     downloadCsv(
       'maas-hesaplamalari.csv',
-      ['Çalışan', 'Dönem', 'Baz Maaş', 'Ücretsiz Gün', 'Kesinti', 'Hesaplanan Maaş'],
+      ['Çalışan', 'Dönem', 'Baz Maaş', 'Ücretsiz Gün', 'Kesinti', 'Mesai Saati', 'Mesai Tutarı', 'Hesaplanan Maaş'],
       records.map(r => {
         const e = empMap.get(r.employee_id)
         return [
@@ -97,6 +150,8 @@ export function SalaryCalculationPage() {
           r.base_salary,
           r.unpaid_leave_days,
           r.deduction_amount,
+          r.overtime_hours ?? 0,
+          r.overtime_amount ?? 0,
           r.calculated_salary,
         ]
       }),
@@ -133,6 +188,13 @@ export function SalaryCalculationPage() {
         <div className="alert alert--danger" style={{ marginBottom: 'var(--sp-4)' }}>
           <Icon name="alert" size={14} />
           <div>{saveError}</div>
+        </div>
+      )}
+
+      {unpaidDaysError && (
+        <div className="alert alert--danger" style={{ marginBottom: 'var(--sp-4)' }}>
+          <Icon name="alert" size={14} />
+          <div>{unpaidDaysError}</div>
         </div>
       )}
 
@@ -175,17 +237,45 @@ export function SalaryCalculationPage() {
               <Input id="base" addon="TRY" value={base.toLocaleString('tr-TR')} readOnly />
             </Field>
 
-            <Field label="Ücretsiz izin günü" hint="Aşağıdaki kesinti bu değerden hesaplanır" htmlFor="days">
+            <Field
+              label="Ücretsiz izin günü"
+              hint={unpaidDaysLoading ? 'Onaylı ücretsiz izinler okunuyor' : 'Onaylı ücretsiz izin taleplerinden otomatik hesaplanır'}
+              htmlFor="days"
+            >
               <Input
                 id="days"
                 addon="days"
                 type="number"
                 min="0"
                 value={unpaidDays}
-                onChange={e => setUnpaidDays(Math.max(0, Number(e.target.value)))}
+                readOnly
               />
             </Field>
 
+            <div className="grid grid--2">
+              <Field label="Mesai saati" htmlFor="ot-hours">
+                <Input
+                  id="ot-hours"
+                  addon="saat"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={overtimeHours}
+                  onChange={e => setOvertimeHours(Math.max(0, Number(e.target.value)))}
+                />
+              </Field>
+              <Field label="Saatlik mesai ücreti" hint={`Varsayılan: ${fmtCurrency(hourly)}`} htmlFor="ot-rate">
+                <Input
+                  id="ot-rate"
+                  addon="TRY"
+                  type="number"
+                  min="0"
+                  placeholder={String(hourly)}
+                  value={overtimeRateOverride}
+                  onChange={e => setOvertimeRateOverride(e.target.value)}
+                />
+              </Field>
+            </div>
           </div>
 
           <div className="calc__summary">
@@ -214,9 +304,19 @@ export function SalaryCalculationPage() {
               <span className="calc__row-value">{fmtCurrency(daily)}</span>
             </div>
             <div className="calc__row">
+              <span className="calc__row-label">Yaklaşık saatlik ücret</span>
+              <span className="calc__row-value">{fmtCurrency(overtimeHourlyRate)}</span>
+            </div>
+            <div className="calc__row">
               <span className="calc__row-label">Ücretsiz izin kesintisi ({unpaidDays} gün)</span>
               <span className="calc__row-value" style={{ color: deduction ? 'var(--status-danger-fg)' : undefined }}>
                 {deduction ? `-${fmtCurrency(deduction)}` : '-'}
+              </span>
+            </div>
+            <div className="calc__row">
+              <span className="calc__row-label">Mesai ek ödemesi ({overtimeHours} saat)</span>
+              <span className="calc__row-value" style={{ color: overtimeAmount ? 'var(--status-success-fg)' : undefined }}>
+                {overtimeAmount ? `+${fmtCurrency(overtimeAmount)}` : '-'}
               </span>
             </div>
             <div className="calc__divider" />
@@ -225,7 +325,7 @@ export function SalaryCalculationPage() {
               <span className="calc__total-v">{fmtCurrency(total)}</span>
             </div>
             <div className="calc__note">
-              Hesaplama ayı 30 gün kabul eder. Resmi bordro çıktısı değildir; muhasebe sisteminizle doğrulayın.
+              Hesaplama ayı 30 gün ve iş günü 7,5 saat kabul eder. Resmi bordro çıktısı değildir; muhasebe sisteminizle doğrulayın.
             </div>
           </div>
         </div>
@@ -237,7 +337,7 @@ export function SalaryCalculationPage() {
         style={{ marginTop: 'var(--sp-6)' } as React.CSSProperties}
       >
         {recordsLoading ? (
-          <table className="table"><tbody>{Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} cols={6} />)}</tbody></table>
+          <table className="table"><tbody>{Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} cols={8} />)}</tbody></table>
         ) : records.length === 0 ? (
           <EmptyState
             icon="wallet"
@@ -253,6 +353,8 @@ export function SalaryCalculationPage() {
                 <th style={{ textAlign: 'right' }}>Baz maaş</th>
                 <th style={{ textAlign: 'right' }}>Ücretsiz gün</th>
                 <th style={{ textAlign: 'right' }}>Kesinti</th>
+                <th style={{ textAlign: 'right' }}>Mesai</th>
+                <th style={{ textAlign: 'right' }}>Mesai tutarı</th>
                 <th style={{ textAlign: 'right' }}>Hesaplanan maaş</th>
               </tr>
             </thead>
@@ -278,6 +380,16 @@ export function SalaryCalculationPage() {
                       className="tabnum"
                     >
                       {r.deduction_amount ? `-${fmtCurrency(r.deduction_amount)}` : '-'}
+                    </td>
+                    <td style={{ textAlign: 'right' }} className="tabnum">{r.overtime_hours ?? 0}</td>
+                    <td
+                      style={{
+                        textAlign: 'right',
+                        color: r.overtime_amount ? 'var(--status-success-fg)' : undefined,
+                      }}
+                      className="tabnum"
+                    >
+                      {r.overtime_amount ? `+${fmtCurrency(r.overtime_amount)}` : '-'}
                     </td>
                     <td style={{ textAlign: 'right' }} className="tabnum">
                       <strong>{fmtCurrency(r.calculated_salary)}</strong>

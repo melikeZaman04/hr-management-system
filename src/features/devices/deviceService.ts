@@ -171,6 +171,25 @@ export async function returnDevice(
   if (dErr) throw new Error(dErr.message)
 }
 
+export async function updateDeviceStatus(
+  deviceId: string,
+  status: Device['status'],
+  notes?: string | null,
+): Promise<void> {
+  const payload: Pick<Device, 'status'> & { notes?: string | null } = { status }
+
+  if (notes !== undefined) {
+    payload.notes = notes?.trim() || null
+  }
+
+  const { error } = await client()
+    .from('devices')
+    .update(payload)
+    .eq('id', deviceId)
+
+  if (error) throw new Error(error.message)
+}
+
 export async function getDeviceCount(): Promise<number> {
   const { count, error } = await client()
     .from('devices')

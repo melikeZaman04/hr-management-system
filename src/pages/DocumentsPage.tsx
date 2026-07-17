@@ -145,7 +145,7 @@ export function DocumentsPage() {
       const doc = await uploadEmployeeDocument({
         file: v.file,
         employeeId: currentEmployee.id,
-        documentType: 'employee_document',
+        documentType: uploadType,
         uploadedByProfileId: profile?.id ?? null,
       })
       setDocuments(prev => [doc, ...prev])
@@ -280,104 +280,131 @@ export function DocumentsPage() {
       />
 
       {isEmployee ? (
-        <Panel
-          title={`${filtered.length} doküman`}
-          actions={
-            <div className="row gap-2">
-              <select className="select" style={{ width: 180, height: 32, fontSize: 'var(--fs-13)' }}
-                value={typeF} onChange={e => setTypeF(e.target.value)}>
-                <option value="all">Tüm türler</option>
-                {docTypes.map(t => <option key={t} value={t}>{DOCUMENT_TYPE_LABELS[t] ?? t}</option>)}
-              </select>
+        <>
+          <Panel
+            title="Yeni doküman yükle"
+            padded
+            style={{ marginBottom: 'var(--sp-6)' } as React.CSSProperties}
+          >
+            <div className="grid grid--2">
+              <Field label="Doküman türü" required htmlFor="employee-upload-type">
+                <Select id="employee-upload-type" value={uploadType} onChange={e => setUploadTür(e.target.value as Document['document_type'])}>
+                  {UPLOADABLE_TYPES.map(([v, label]) => <option key={v} value={v}>{label}</option>)}
+                </Select>
+              </Field>
+              <Field label="Dosya" htmlFor="employee-upload-file">
+                <Button
+                  id="employee-upload-file"
+                  variant="primary"
+                  icon="upload"
+                  disabled={!currentEmployee || uploading}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {uploading ? 'Yükleniyor...' : 'Dosya seç'}
+                </Button>
+              </Field>
             </div>
-          }
-        >
-          {uploadError && (
-            <div className="alert alert--danger" style={{ marginBottom: 'var(--sp-4)' }}>
-              <Icon name="alert" size={14} />
-              <div>{uploadError}</div>
-            </div>
-          )}
-          {loading ? (
-            <table className="table"><tbody>{Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} cols={5} />)}</tbody></table>
-          ) : error ? (
-            <ErrorState desc={error} action={<Button onClick={load}>Tekrar dene</Button>} />
-          ) : filtered.length === 0 ? (
-            <EmptyState
-              icon="document"
-              title="Henüz doküman yok"
-              desc="Henüz yüklediğiniz bir doküman bulunmuyor."
-            />
-          ) : (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Dosya</th>
-                  <th>Tür</th>
-                  <th>Çalışan</th>
-                  <th>Yüklendi</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(d => {
-                  const emp = d.employee_id ? empMap.get(d.employee_id) : null
-                  const dlState = downloadState[d.id]
-                  const delState = deleteState[d.id]
-                  return (
-                    <tr key={d.id}>
-                      <td>
-                        <div className="table__cell-primary">
-                          <div style={{ width: 32, height: 32, borderRadius: 'var(--r-md)', background: 'var(--bg-sunken)', border: '1px solid var(--border-subtle)', display: 'grid', placeItems: 'center', color: 'var(--text-tertiary)' }}>
-                            <Icon name="paperclip" size={14} />
+            {uploadError && (
+              <div className="alert alert--danger" style={{ marginTop: 'var(--sp-4)' }}>
+                <Icon name="alert" size={14} />
+                <div>{uploadError}</div>
+              </div>
+            )}
+          </Panel>
+
+          <Panel
+            title={`${filtered.length} doküman`}
+            actions={
+              <div className="row gap-2">
+                <select className="select" style={{ width: 180, height: 32, fontSize: 'var(--fs-13)' }}
+                  value={typeF} onChange={e => setTypeF(e.target.value)}>
+                  <option value="all">Tüm türler</option>
+                  {docTypes.map(t => <option key={t} value={t}>{DOCUMENT_TYPE_LABELS[t] ?? t}</option>)}
+                </select>
+              </div>
+            }
+          >
+            {loading ? (
+              <table className="table"><tbody>{Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} cols={5} />)}</tbody></table>
+            ) : error ? (
+              <ErrorState desc={error} action={<Button onClick={load}>Tekrar dene</Button>} />
+            ) : filtered.length === 0 ? (
+              <EmptyState
+                icon="document"
+                title="Henüz doküman yok"
+                desc="Henüz yüklediğiniz bir doküman bulunmuyor."
+              />
+            ) : (
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Dosya</th>
+                    <th>Tür</th>
+                    <th>Çalışan</th>
+                    <th>Yüklendi</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map(d => {
+                    const emp = d.employee_id ? empMap.get(d.employee_id) : null
+                    const dlState = downloadState[d.id]
+                    const delState = deleteState[d.id]
+                    return (
+                      <tr key={d.id}>
+                        <td>
+                          <div className="table__cell-primary">
+                            <div style={{ width: 32, height: 32, borderRadius: 'var(--r-md)', background: 'var(--bg-sunken)', border: '1px solid var(--border-subtle)', display: 'grid', placeItems: 'center', color: 'var(--text-tertiary)' }}>
+                              <Icon name="paperclip" size={14} />
+                            </div>
+                            <div className="table__cell-stack">
+                              <span className="table__cell-name mono" style={{ fontSize: 'var(--fs-13)' }}>{d.file_name}</span>
+                              <span className="table__cell-sub">{fmtDate(d.created_at)}</span>
+                            </div>
                           </div>
-                          <div className="table__cell-stack">
-                            <span className="table__cell-name mono" style={{ fontSize: 'var(--fs-13)' }}>{d.file_name}</span>
-                            <span className="table__cell-sub">{fmtDate(d.created_at)}</span>
+                        </td>
+                        <td><Badge tone="info" dot={false}>{DOCUMENT_TYPE_LABELS[d.document_type] ?? d.document_type}</Badge></td>
+                        <td>
+                          {emp ? (
+                            <button className="row gap-2" onClick={() => navigate(`/employees/${emp.id}`)} style={{ cursor: 'pointer' }}>
+                              <Avatar name={emp.full_name} size="sm" />
+                              <span>{emp.full_name}</span>
+                            </button>
+                          ) : <span className="text-ter">-</span>}
+                        </td>
+                        <td className="text-sec">{fmtDate(d.created_at)}</td>
+                        <td style={{ textAlign: 'right' }}>
+                          <div className="row gap-1" style={{ justifyContent: 'flex-end' }}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              icon="download"
+                              aria-label="İndir"
+                              disabled={dlState === 'loading'}
+                              onClick={() => handleDownload(d)}
+                            >
+                              {dlState === 'loading' ? '...' : dlState === 'error' ? 'Hata' : ''}
+                            </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              icon="trash"
+                              aria-label="Sil"
+                              disabled={delState === 'loading'}
+                              onClick={() => handleDelete(d)}
+                            >
+                              {delState === 'loading' ? '...' : delState === 'error' ? 'Hata' : ''}
+                            </Button>
                           </div>
-                        </div>
-                      </td>
-                      <td><Badge tone="info" dot={false}>{DOCUMENT_TYPE_LABELS[d.document_type] ?? d.document_type}</Badge></td>
-                      <td>
-                        {emp ? (
-                          <button className="row gap-2" onClick={() => navigate(`/employees/${emp.id}`)} style={{ cursor: 'pointer' }}>
-                            <Avatar name={emp.full_name} size="sm" />
-                            <span>{emp.full_name}</span>
-                          </button>
-                        ) : <span className="text-ter">-</span>}
-                      </td>
-                      <td className="text-sec">{fmtDate(d.created_at)}</td>
-                      <td style={{ textAlign: 'right' }}>
-                        <div className="row gap-1" style={{ justifyContent: 'flex-end' }}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            icon="download"
-                            aria-label="İndir"
-                            disabled={dlState === 'loading'}
-                            onClick={() => handleDownload(d)}
-                          >
-                            {dlState === 'loading' ? '...' : dlState === 'error' ? 'Hata' : ''}
-                          </Button>
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            icon="trash"
-                            aria-label="Sil"
-                            disabled={delState === 'loading'}
-                            onClick={() => handleDelete(d)}
-                          >
-                            {delState === 'loading' ? '...' : delState === 'error' ? 'Hata' : ''}
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          )}
-        </Panel>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            )}
+          </Panel>
+        </>
       ) : (
         <div className="grid grid--12-8" style={{ alignItems: 'start' }}>
 

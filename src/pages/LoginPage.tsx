@@ -7,6 +7,16 @@ import { Field, Input } from '../components/ui/Field'
 
 type LoginLocationState = { from?: { pathname?: string } }
 
+function getLoginErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : ''
+
+  if (message.toLowerCase().includes('failed to fetch')) {
+    return 'Supabase bağlantısı kurulamadı. .env.local içindeki VITE_SUPABASE_URL doğru mu ve proje erişilebilir mi kontrol edin.'
+  }
+
+  return message || 'Giriş başarısız.'
+}
+
 export function LoginPage() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -31,7 +41,7 @@ export function LoginPage() {
       await signIn(email, password)
       navigate(redirectTo, { replace: true })
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Giriş başarısız.')
+      setErrorMessage(getLoginErrorMessage(error))
     } finally {
       setIsSubmitting(false)
     }

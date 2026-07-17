@@ -1,7 +1,7 @@
 ﻿import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  getDevices, getDevicesForEmployee, createDevice, assignDevice, returnDevice,
+  getDevices, getDevicesForEmployee, createDevice, assignDevice, returnDevice, updateDeviceStatus,
   type DeviceWithAssignee,
 } from '../features/devices/deviceService'
 import { getEmployees, getEmployeeForAuth, type EmployeeListItem } from '../features/employees/employeeService'
@@ -40,6 +40,8 @@ export function DevicesPage() {
   const [addOpen, setAddOpen] = useState(false)
   const [assignTarget, setAssignTarget] = useState<DeviceWithAssignee | null>(null)
   const [returnTarget, setReturnTarget] = useState<DeviceWithAssignee | null>(null)
+  const [deviceActionId, setDeviceActionId] = useState<string | null>(null)
+  const [deviceActionError, setDeviceActionError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -100,7 +102,7 @@ export function DevicesPage() {
     if (isEmployee) return
     downloadCsv(
       'cihazlar.csv',
-      ['Cihaz', 'Tür', 'Marka', 'Model', 'Seri Numarası', 'Lokasyon', 'Atanan Kişi', 'Durum', 'Atanma Tarihi'],
+      ['Cihaz', 'Tür', 'Marka', 'Model', 'Seri Numarası', 'Lokasyon', 'Fatura / Not', 'Atanan Kişi', 'Durum', 'Atanma Tarihi'],
       filtered.map(d => {
         const owner = d.assignee_id ? empMap.get(d.assignee_id) : null
         return [
@@ -110,12 +112,54 @@ export function DevicesPage() {
           d.model ?? '',
           d.serial_number ?? '',
           d.location ?? '',
+          d.notes ?? '',
           owner?.full_name ?? '',
           d.status,
           d.assigned_at ?? '',
         ]
       }),
     )
+  }
+
+  function appendDeviceNote(current: string | null, note: string) {
+    return [current?.trim(), note].filter(Boolean).join('\n')
+  }
+
+  async function handleMarkBroken(device: DeviceWithAssignee) {
+    try {
+      setDeviceActionId(device.id)
+      setDeviceActionError(null)
+      const today = new Date().toISOString().slice(0, 10)
+      await updateDeviceStatus(
+        device.id,
+        'broken',
+        appendDeviceNote(device.notes, `[Arıza] ${today}: Cihaz arızalı olarak işaretlendi.`),
+      )
+      await load()
+    } catch (err) {
+      setDeviceActionError(err instanceof Error ? err.message : 'Cihaz arızalı olarak işaretlenemedi.')
+    } finally {
+      setDeviceActionId(null)
+    }
+  }
+
+  async function handleRepairDevice(device: DeviceWithAssignee) {
+    try {
+      setDeviceActionId(device.id)
+      setDeviceActionError(null)
+      const nextStatus = device.assignee_id ? 'assigned' : 'available'
+      const today = new Date().toISOString().slice(0, 10)
+      await updateDeviceStatus(
+        device.id,
+        nextStatus,
+        appendDeviceNote(device.notes, `[Tamir] ${today}: Cihaz tekrar kullanıma hazır.`),
+      )
+      await load()
+    } catch (err) {
+      setDeviceActionError(err instanceof Error ? err.message : 'Cihaz durumu güncellenemedi.')
+    } finally {
+      setDeviceActionId(null)
+    }
   }
 
   return (
@@ -150,6 +194,13 @@ export function DevicesPage() {
           <StatCard label="Atanmış" value={String(counts.assigned)} icon="laptop" />
           <StatCard label="Atanmamış" value={String(counts.available)} icon="check" />
           <StatCard label="Arızalı" value={String(counts.broken)} icon="alert" />
+        </div>
+      )}
+
+      {deviceActionError && (
+        <div className="alert alert--danger" style={{ marginBottom: 'var(--sp-4)' }}>
+          <Icon name="alert" size={14} />
+          <div>{deviceActionError}</div>
         </div>
       )}
 
@@ -232,7 +283,7 @@ export function DevicesPage() {
         }
       >
         {loading ? (
-          <table className="table"><tbody>{Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} cols={isEmployee ? 5 : 6} />)}</tbody></table>
+          <table className="table"><tbody>{Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} cols={isEmployee ? 6 : 7} />)}</tbody></table>
         ) : error ? (
           <ErrorState desc={error} action={<Button onClick={load}>Tekrar dene</Button>} />
         ) : filtered.length === 0 ? (
@@ -247,9 +298,10 @@ export function DevicesPage() {
                 <th>Tür</th>
                 <th>Seri numarası</th>
                 <th>Lokasyon</th>
+                <th>Fatura / not</th>
                 {!isEmployee && <th>Atanan kişi</th>}
                 <th>Durum</th>
-                {!isEmployee && <th style={{ width: 160 }}></th>}
+                {!isEmployee && <th style={{ width: 230 }}></th>}
               </tr>
             </thead>
             <tbody>
@@ -271,6 +323,9 @@ export function DevicesPage() {
                     <td className="text-sec">{d.device_type}</td>
                     <td className="mono text-sec">{d.serial_number ?? '-'}</td>
                     <td className="text-sec">{d.location ?? '-'}</td>
+                    <td className="text-sec" style={{ maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {d.notes ?? '-'}
+                    </td>
                     {!isEmployee && (
                       <td>
                         {owner ? (
@@ -284,11 +339,35 @@ export function DevicesPage() {
                     <td><StatusBadge status={d.status} /></td>
                     {!isEmployee && (
                       <td style={{ textAlign: 'right' }}>
-                        {d.status === 'assigned'
-                          ? <Button variant="secondary" size="sm" icon="arrowLeft" onClick={() => setReturnTarget(d)}>İade al</Button>
-                          : d.status === 'available'
-                            ? <Button variant="primary" size="sm" icon="arrowRight" onClick={() => setAssignTarget(d)}>Ata</Button>
-                            : <Button variant="ghost" size="sm" icon="more" className="table__action" aria-label="Daha fazla" />}
+                        <div className="row gap-2" style={{ justifyContent: 'flex-end' }}>
+                          {d.status === 'assigned' && (
+                            <Button variant="secondary" size="sm" icon="arrowLeft" onClick={() => setReturnTarget(d)}>İade al</Button>
+                          )}
+                          {d.status === 'available' && (
+                            <Button variant="primary" size="sm" icon="arrowRight" onClick={() => setAssignTarget(d)}>Ata</Button>
+                          )}
+                          {d.status === 'broken' ? (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              icon="check"
+                              disabled={deviceActionId === d.id}
+                              onClick={() => handleRepairDevice(d)}
+                            >
+                              Tamir edildi
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              icon="alert"
+                              disabled={deviceActionId === d.id}
+                              onClick={() => handleMarkBroken(d)}
+                            >
+                              Arızalı
+                            </Button>
+                          )}
+                        </div>
                       </td>
                     )}
                   </tr>
@@ -343,6 +422,9 @@ interface AddForm {
   brand: string
   model: string
   serial_number: string
+  invoice_number: string
+  invoice_date: string
+  invoice_amount: string
   location: string
   notes: string
 }
@@ -353,8 +435,24 @@ const EMPTY_DEVICE_FORM: AddForm = {
   brand: '',
   model: '',
   serial_number: '',
+  invoice_number: '',
+  invoice_date: '',
+  invoice_amount: '',
   location: 'Merkez Ofis',
   notes: '',
+}
+
+function buildDeviceNotes(form: AddForm) {
+  const invoiceParts = [
+    form.invoice_number.trim() ? `No: ${form.invoice_number.trim()}` : '',
+    form.invoice_date ? `Tarih: ${form.invoice_date}` : '',
+    form.invoice_amount.trim() ? `Tutar: ${form.invoice_amount.trim()} TRY` : '',
+  ].filter(Boolean)
+
+  return [
+    invoiceParts.length > 0 ? `Fatura - ${invoiceParts.join(' | ')}` : '',
+    form.notes.trim(),
+  ].filter(Boolean).join('\n')
 }
 
 function AddDeviceModal({
@@ -386,7 +484,7 @@ function AddDeviceModal({
         model: form.model || undefined,
         serial_number: form.serial_number || undefined,
         location: form.location || undefined,
-        notes: form.notes || undefined,
+        notes: buildDeviceNotes(form) || undefined,
       })
       setForm(EMPTY_DEVICE_FORM)
       onCreated()
@@ -425,6 +523,23 @@ function AddDeviceModal({
         </Field>
         <Field label="Seri numarası" hint="Bilinmiyorsa boş bırakın" htmlFor="ad-serial">
           <Input id="ad-serial" placeholder="SN123456" value={form.serial_number} onChange={e => set('serial_number', e.target.value)} />
+        </Field>
+        <Field label="Fatura no" htmlFor="ad-invoice-no">
+          <Input id="ad-invoice-no" placeholder="Örn. FTR-2026-001" value={form.invoice_number} onChange={e => set('invoice_number', e.target.value)} />
+        </Field>
+        <Field label="Fatura tarihi" htmlFor="ad-invoice-date">
+          <Input id="ad-invoice-date" type="date" value={form.invoice_date} onChange={e => set('invoice_date', e.target.value)} />
+        </Field>
+        <Field label="Fatura tutarı" htmlFor="ad-invoice-amount">
+          <Input
+            id="ad-invoice-amount"
+            addon="TRY"
+            type="number"
+            min="0"
+            placeholder="Örn. 45000"
+            value={form.invoice_amount}
+            onChange={e => set('invoice_amount', e.target.value)}
+          />
         </Field>
         <Field label="Lokasyon" htmlFor="ad-location">
           <Input id="ad-location" placeholder="Örn. Merkez Ofis / Depo" value={form.location} onChange={e => set('location', e.target.value)} />
